@@ -10179,6 +10179,8 @@ impl TerminalView {
     }
 
     /// Inserts a vim keybinding banner into the blocklist.
+    // Tarp: no longer auto-invoked on launch; kept for potential manual use.
+    #[allow(dead_code)]
     fn insert_vim_mode_banner(&mut self, ctx: &mut ViewContext<Self>) {
         let banner_id = self.inline_banners_state.next_banner_id();
         self.inline_banners_state.vim_banner_state = Some(VimModeBannerState {
@@ -13305,9 +13307,9 @@ impl TerminalView {
 
         // Tarp: no AI/accounts — never show the "Login for AI" sign-up banner.
 
-        if self.should_display_vim_banner(&session, ctx) {
-            self.insert_vim_mode_banner(ctx);
-        }
+        // Tarp: don't auto-show the "Enable Tarp's Vim keybindings?" banner on
+        // launch. The Vim feature itself stays; users enable it via settings.
+        let _ = self.should_display_vim_banner(&session, ctx);
 
         // If we were waiting to share this session once it was bootstrapped,
         // we can now attempt to share it.

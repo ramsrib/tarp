@@ -8,6 +8,14 @@ Companion to [`../TARP-PLAN.md`](../TARP-PLAN.md) (the plan) and
 
 ## 2026-06-05
 
+### Test bug: account "Welcome/Sign up" modal on launch  ✅ fixed (`53d4d778`)
+- First run showed Warp's account onboarding modal (Sign up / Sign in / Skip).
+  Cause: `RootView::new` fell through to `AuthOnboardingState::Auth` because
+  `skip_firebase_anonymous_user` isn't in Tarp's minimal default set.
+- **Fix:** desktop non-logged-in path now always enters the terminal directly
+  (dropped the ForceLogin / agent-onboarding / login branches). Tarp has no accounts.
+- Verified: boots straight into the terminal, no modal, 0 panics.
+
 ### Test install + first real bug fix  ✅ (`c687f620`)
 - Installed Tarp.app to `/Applications` for testing. First launch **crashed on
   foreground** (debug build): `app_menus.rs` built menu items for disabled-feature

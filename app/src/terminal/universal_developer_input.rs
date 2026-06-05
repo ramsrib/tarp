@@ -437,15 +437,13 @@ impl UniversalDeveloperInputButtonBar {
         let ai_settings = AISettings::as_ref(ctx);
         let is_autodetection_enabled = ai_settings.is_ai_autodetection_enabled(ctx);
 
-        let mut options = vec![InputToggleMode::Terminal, InputToggleMode::AgentMode];
+        // Tarp: only the Terminal mode is offered; the Agent Mode / auto-detection
+        // AI toggles are removed. Keep the single Terminal option so the `>_`
+        // indicator still renders and command entry is unaffected.
+        let _ = is_autodetection_enabled;
+        let options = vec![InputToggleMode::Terminal];
 
-        let mut default_option = input_model.as_ref(ctx).into();
-        if is_autodetection_enabled {
-            options.push(InputToggleMode::AutoDetection);
-        } else if default_option == InputToggleMode::AutoDetection {
-            // Don't set the default to auto-detection if it's not enabled.
-            default_option = InputToggleMode::Terminal;
-        }
+        let default_option = InputToggleMode::Terminal;
 
         let cached_ui_state = Rc::new(RefCell::new(CachedUIState {
             is_input_empty: true,
@@ -501,27 +499,9 @@ impl UniversalDeveloperInputButtonBar {
         ctx.subscribe_to_model(&AISettings::handle(ctx), |me, ai_settings, event, ctx| {
             // Re-render when AI settings change (like voice input enabled/disabled)
             // Also update segmented control options when auto-detection setting changes
-            if let AISettingsChangedEvent::AIAutoDetectionEnabled { .. } = event {
-                let is_autodection_enabled =
-                    ai_settings.as_ref(ctx).is_ai_autodetection_enabled(ctx);
-                me.segmented_control.update(ctx, |segmented_control, ctx| {
-                    if is_autodection_enabled {
-                        segmented_control.update_options(
-                            vec![
-                                InputToggleMode::Terminal,
-                                InputToggleMode::AgentMode,
-                                InputToggleMode::AutoDetection,
-                            ],
-                            ctx,
-                        );
-                    } else {
-                        segmented_control.update_options(
-                            vec![InputToggleMode::Terminal, InputToggleMode::AgentMode],
-                            ctx,
-                        );
-                    }
-                });
-            }
+            // Tarp: the toggle only ever offers Terminal mode, so AI
+            // auto-detection setting changes never alter the available options.
+            let _ = (ai_settings, event);
             ctx.notify();
         });
 
@@ -795,7 +775,7 @@ impl View for UniversalDeveloperInputButtonBar {
         let appearance = Appearance::as_ref(app);
         let theme = appearance.theme();
         #[cfg(feature = "voice_input")]
-        let is_voice_input_enabled = AISettings::as_ref(app).is_voice_input_enabled(app);
+        let _is_voice_input_enabled = AISettings::as_ref(app).is_voice_input_enabled(app);
 
         // Helper function to create a 1px vertical divider
         let create_divider = || {
@@ -823,16 +803,14 @@ impl View for UniversalDeveloperInputButtonBar {
                         .with_padding_right(4.0)
                         .finish(),
                 );
-            buttons = buttons.with_child(create_divider());
-
-            buttons = buttons.with_child(ChildView::new(&self.slash_command_button).finish());
-
-            #[cfg(feature = "voice_input")]
-            if is_voice_input_enabled {
-                buttons = buttons.with_child(ChildView::new(&self.mic_button).finish());
-            }
-
-            buttons = buttons.with_child(ChildView::new(&self.at_button).finish());
+            // Tarp: the AI affordances in this toolbar row are removed. Dropped:
+            //  - the `/` slash-command button (agent/AI slash commands)
+            //  - the `@` AI-context button
+            //  - the AI model selector dropdown
+            // Kept: the Terminal `>_` indicator (segmented_control) and the
+            // plain `+` file-attach button. The command editor is a separate
+            // view, so removing these does not affect typing/running commands.
+            let _ = &model_selector_element;
 
             // Viewers cannot attach files in shared sessions at this point.
             if !self
@@ -841,15 +819,8 @@ impl View for UniversalDeveloperInputButtonBar {
                 .shared_session_status()
                 .is_viewer()
             {
+                buttons = buttons.with_child(create_divider());
                 buttons = buttons.with_child(ChildView::new(&self.file_button).finish());
-            }
-
-            let show_model_selector = FeatureFlag::ProfilesDesignRevamp.is_enabled()
-                || *SessionSettings::as_ref(app).show_model_selectors_in_prompt;
-            if show_model_selector {
-                buttons = buttons
-                    .with_child(create_divider())
-                    .with_child(model_selector_element);
             }
 
             if !self.prompt_alert.as_ref(app).is_no_alert() {

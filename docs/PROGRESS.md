@@ -8,6 +8,18 @@ Companion to [`../TARP-PLAN.md`](../TARP-PLAN.md) (the plan) and
 
 ## 2026-06-05
 
+### M3 — app icon replaced (release blocker cleared)  ✅ (`f395c1cc`)
+- User supplied two candidates (`~/Desktop/tarp-{1,2}.png`); chose **tarp-2** (tarp
+  peeled back to reveal a green terminal) — better concept fit, contrast, and
+  fills the rounded-square per macOS convention.
+- Processed with ImageMagick: corner-floodfill white→transparent (preserves
+  interior whites), squared, full-bleed rounded. Replaced
+  `channels/oss/icon/no-padding/{512x512.png,icon.ico}`; kept `AppIcon-source.png`
+  (high-res transparent master) for regen. Verified `Tarp.icns` bakes into Tarp.app.
+- **Icon release blocker: RESOLVED.** Remaining icon polish (non-blocking): retina
+  1024/`.icon` adaptive bundle (cargo-bundle's icns generator rejected a >2-entry
+  list; current 512 source upscales for retina) and Linux icon install verification.
+
 ### M0 — repo hygiene (partial)  ✅ in progress (branch `dewarp`)
 - `a0c614c3` — rewrote `README.md` for Tarp (dropped Warp's Oz/cloud/careers/Slack
   sections + product imagery; added affiliation disclaimer, Tarp build commands,

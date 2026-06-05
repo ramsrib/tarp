@@ -8,6 +8,19 @@ Companion to [`../TARP-PLAN.md`](../TARP-PLAN.md) (the plan) and
 
 ## 2026-06-05
 
+### Wave 2 — step 4: AI engine-removal feasibility investigation  ✅ finding
+- Investigated the "engine-only" middle path the user picked. **Verdict: it doesn't
+  exist as a smaller option.** The `ai::` refs are `crate::ai::` (app's internal
+  `app/src/ai/`, 459 files / ~222k LOC); **334 external files** import its types;
+  `AISettings` itself imports `crate::ai`; and AI is co-entangled with
+  cloud/server/auth. So AI removal = one ~600–700-file coordinated AI+cloud surgery,
+  not sliceable, high upstream divergence. Detail:
+  [`removal/ai-removal-feasibility.md`](removal/ai-removal-feasibility.md).
+- **Reframe:** end-state is a spectrum — (a) features off / code present (where we
+  are; low effort, low divergence, ships now) vs (b) code deleted (clean but big +
+  high divergence). Recommendation: ship the disabled-AI terminal as an early
+  release (after branding), treat full deletion as a separate optional large project.
+
 ### Wave 2 — step 3: AI-removal pass → `voice_input` removed; AI is monolithic  ✅/finding (branch `dewarp`, `c00d58e3`)
 - Ran a worktree-isolated agent to attempt the AI/agent removal. Outcome: it
   removed the one cleanly-excisable AI crate (**`voice_input`**, see

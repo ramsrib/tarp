@@ -1,5 +1,5 @@
 [package]
-authors = ["Warp Team <dev@warp.dev>"]
+authors = ["The Tarp Authors", "Warp Team <dev@warp.dev>"]
 default-run = "tarp"
 description = "Tarp — a plain, fast terminal"
 edition = "2021"

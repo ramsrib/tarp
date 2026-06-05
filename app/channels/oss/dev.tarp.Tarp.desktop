@@ -1,0 +1,23 @@
+[Desktop Entry]
+# The version of the desktop entry spec this conforms to.
+Version=1.0
+
+Type=Application
+
+Name=Tarp
+GenericName=TerminalEmulator
+
+Exec=tarp %U
+StartupWMClass=dev.tarp.Tarp
+
+Keywords=shell;prompt;command;commandline;cmd;
+
+Icon=dev.tarp.Tarp
+
+Categories=System;TerminalEmulator;
+
+# Don't run this application within a terminal.
+Terminal=false
+
+# Register ourselves as the handler for tarp:// URLs.
+MimeType=x-scheme-handler/tarp;

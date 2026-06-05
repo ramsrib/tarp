@@ -8,6 +8,31 @@ Companion to [`../TARP-PLAN.md`](../TARP-PLAN.md) (the plan) and
 
 ## 2026-06-05
 
+### Wave 2 — step 3: AI-removal pass → `voice_input` removed; AI is monolithic  ✅/finding (branch `dewarp`, `c00d58e3`)
+- Ran a worktree-isolated agent to attempt the AI/agent removal. Outcome: it
+  removed the one cleanly-excisable AI crate (**`voice_input`**, see
+  [`REMOVED.md`](REMOVED.md)) to a green build with **zero tracked-crate edits**, and
+  then correctly stopped.
+- **Major scoping finding:** the rest of the AI surface is **one monolithic,
+  all-at-once removal** — no further clean leaves:
+  - `ai`, `mcp`, `computer_use`, `input_classifier`, `natural_language_detection`
+    are **unconditionally compiled** (not feature-gated); `mcp`/`computer_use` are
+    leaves *of `ai`*, not independently removable.
+  - `mod ai;` is unconditional; AI singletons are added unconditionally in
+    `lib.rs`; **`AISettings` has 1,146 refs across 114 always-compiled files**,
+    incl. `terminal/view.rs` (**28,306 lines**), `workspace/view.rs`,
+    `terminal/input.rs`, persistence, server. It also reaches into the sibling
+    cloud / code-editor / notebooks surfaces.
+  - ⇒ removing AI = untangling `lib.rs`'s singleton graph + the central terminal
+    files in one sustained ~629-file / 222k-LOC effort; it cannot be sliced into
+    green-building increments.
+- **Revised plan:** the AI removal is a dedicated, sustained pass (its own branch,
+  many build iterations, the approved `persistence` edit), not incremental leaves.
+  Decide vehicle/approach before starting. Until then `dewarp` stays green with the
+  reduced default + `voice_input` gone.
+- Left ~333 inert `#[cfg(feature="voice_input")]` warning-only sites to be deleted
+  with the AI pass (voice is AI-coupled) — not polished now (throwaway churn).
+
 ### Wave 2 — step 2: telemetry no-op baseline + entanglement findings  ✅ (analysis/correction)
 - **Telemetry Phase 1 (no-op) confirmed as the achieved state.** OSS channel
   defaults to `telemetry_config: None` / `crash_reporting_config: None`; step-1

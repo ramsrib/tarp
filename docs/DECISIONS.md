@@ -98,8 +98,12 @@ cleaner and less error-prone than a local mirror branch you can accidentally com
 to; the tag guarantees the baseline never gets lost. Implements the sync strategy in
 ADR-003 / `08-upstream-sync.md`.
 
-**Remote steps (deferred — outward-facing, owner action):** push `main`
-(`git push -u origin main`), set GitHub's default branch to `main`
-(`gh repo edit --default-branch main`), delete `origin/master`
-(`git push origin --delete master`), push the tag (`git push origin fork-base`).
-Nothing has been pushed yet; the repo's remote still has `master` as default.
+**Remote rollout status (2026-06-05):**
+- ✅ `main` pushed to `origin`; ✅ `fork-base` tag pushed; ✅ `upstream` remote set.
+- ⚠️ **Default branch still `master`** and `origin/master` not yet deleted. The
+  `gh`-authed account (`sri-vapi`) can read but is **not admin** of `ramsrib/tarp`
+  (settings PATCH → 404), and git push authenticates as a different identity
+  (`ramsrib`). Flipping the default branch is admin-only.
+- **Owner action needed (`ramsrib`):** set default to `main`
+  (GitHub Settings → Branches, or `gh repo edit ramsrib/tarp --default-branch main`
+  when logged in as the owner), then `git push origin --delete master`.

@@ -58,6 +58,34 @@ Two categories:
   (absent from the default+gui compiled target / `cargo tree`), so it excised to a
   green build without touching the AI core.
 
+### UI surfaces — AI/account/cloud chrome removed (2026-06-05)
+App-layer UI removals (render code gated/removed); underlying crates still compiled
+in (full source deletion = later M6). Each commit is revertable. Surfaced during
+interactive testing; see [`PROGRESS.md`](PROGRESS.md) for the narrative.
+
+| Surface | What was removed | Commit |
+|---|---|---|
+| App menu bar | "AI" + "Drive" menus; Warp Drive / Conversation View items; disabled-action menu panic fix | `c687f620` |
+| Startup | Account "Welcome / Sign up" modal — boots straight to terminal | `53d4d778` |
+| Tab bar / banner | Anonymous "Sign up" button; "Login for AI" banner; vim prompt "Warp's"→"Tarp's" | `55e79cd8` |
+| Settings tabs | Account, Agents, Cloud platform, Teams, Referrals, Warpify, Warp Drive, Privacy, Shared blocks (kept Appearance/Features/Keyboard/About) | `792254c7`, `886d3a17` |
+| About page | Warp wordmark SVG dropped; Tarp text + fork copyright | `202a6753`, `886d3a17` |
+| Privacy/links | `warp.dev` → Tarp repo (`util/links.rs`) | `2708faf7` |
+| Header toolbar | Warp AI, Code review panel, Warp Essentials + AI/cloud icons | `3ef739f0` |
+| Left sidebar | Project Explorer, Warp Drive, Conversation list; then Global Search + the sidebar toggle | `cd9a8c66`, `45c5fe89` |
+| Input toolbar row | Agent Mode toggle, AI model selector ("auto (cost-efficient)"), `@` context, `/` slash, `+` AI file-attach, `>_` dead mode indicator | `ff7e6951`, `3b7ede33` |
+| Command palette | Warp Drive, Notebooks, Environment Variables, Conversations chips (kept Workflows/Files/Actions/Sessions/Launch configs) | `9dbb6996` |
+| Context menus | "Share session" (sign-up popup), "Ask Warp AI" (all builders) | `73a01f60` |
+| Workflow editor | "Generate title… with Warp AI" | `953a8d19` |
+| Vim banner | No longer auto-shown on launch (feature kept; enable via settings) | `2bb007b2` |
+
+**Restore any row:** `git revert <commit>`.
+**Kept (decided terminal features):** working-directory picker, vim keybindings (via
+settings), command palette + Files search, workflows, themes, SSH, tabs/panes.
+**Still compiled-in but not surfaced (later M6 source deletion):** `ai`/`billing`/
+`pricing`/`drive`/`voice` modules; the alternate `agent_input_footer` path; the
+cloud-gated "Save as workflow" item; Ask-AI/Share keybinding registrations (gated).
+
 <!-- Template for each deletion:
 ### <feature/area> — commit `<sha>`
 - **Removed crates:** crates/x, crates/y

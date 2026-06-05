@@ -38,8 +38,25 @@ Two categories:
 
 ## Deleted (code/crates removed)
 
-_None yet. Entries are added here as the Wave-2 removal passes land, each with its
-own revert commit._
+### `voice_input` crate (AI dictation) — commit `c00d58e3`
+- **Removed crates:** `crates/voice_input` (422 LOC) — the AI voice-dictation engine.
+- **Removed features:** `voice_input` (`app/Cargo.toml`); `gui` no longer pulls it
+  (already `gui = []` from step 1).
+- **Removed deps:** `voice_input` from workspace `Cargo.toml [workspace.dependencies]`
+  and from `app/Cargo.toml`; `Cargo.lock` regenerated (−206 lines).
+- **Tracked-crate edits:** none.
+- **Build:** green (`cargo build --bin warp-oss --features gui`, 0 errors).
+- **Left inert (deferred to the AI pass):** ~333 `#[cfg(feature = "voice_input")]`
+  sites across `app/src` (e.g. `terminal/view.rs`, `root_view.rs`, `lib.rs`,
+  `editor/view/*`) now reference a removed feature → permanently-off dead cfg
+  (compile-skipped) that emits `unexpected_cfgs` warnings only. Also left on disk:
+  `app/src/editor/view/voice.rs` and `app/src/voice/` (the latter is the server-side
+  `VoiceTranscriber`, not the crate). These are deleted as part of the AI removal,
+  since voice is coupled to the AI stack (`ai::blocklist`, `server_api::TranscribeError`).
+- **Restore:** `git revert c00d58e3` (brings back the crate, deps, and lock).
+- **Why removable now:** it was the only AI crate already fully feature-gated off
+  (absent from the default+gui compiled target / `cargo tree`), so it excised to a
+  green build without touching the AI core.
 
 <!-- Template for each deletion:
 ### <feature/area> — commit `<sha>`

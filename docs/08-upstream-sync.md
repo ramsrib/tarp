@@ -64,12 +64,18 @@ The layer Tarp rewrites/strips — accept divergence here:
 
 ## Git mechanics
 
-### 1. Add upstream as a remote, mirror it on a pristine branch
+### 1. Branch model (see ADR-006)
+Already set up:
+- **`main`** — Tarp dev (default).
+- **`upstream`** remote → `https://github.com/warpdotdev/warp.git` (upstream's
+  default branch is **`master`**). Sync from the `upstream/master` remote-tracking
+  ref — no hand-maintained local mirror branch (a tracking ref can't be accidentally
+  committed to).
+- **`fork-base`** tag = the fork point (`2bb3a04b`), for diffing the baseline.
+
 ```sh
-git remote add upstream https://github.com/warpdotdev/warp.git
-git fetch upstream
-# Optional: keep a never-modified mirror branch for diffing/cherry-picking
-git branch upstream-main upstream/main
+git fetch upstream                      # refresh upstream/master (large first time)
+git log --oneline fork-base..upstream/master -- <tracked paths>   # what's new
 ```
 Record the last-synced upstream SHA in a tracked file, e.g. `UPSTREAM_SYNC`:
 ```
@@ -83,7 +89,7 @@ Periodically list upstream commits **touching tracked paths only** since the las
 sync, then cherry-pick the relevant ones:
 ```sh
 git fetch upstream
-git log --oneline <last_synced_sha>..upstream/main -- \
+git log --oneline <last_synced_sha>..upstream/master -- \
   crates/warpui crates/warpui_core crates/warp_terminal crates/warp_core \
   crates/editor crates/command crates/warp_completer crates/vim \
   crates/syntax_tree crates/markdown_parser app/assets/bundled/bootstrap
@@ -97,11 +103,11 @@ git cherry-pick <sha1> <sha2> ...
 When you want to take an entire file/dir to upstream's version (e.g. a renderer or
 dep bump):
 ```sh
-git checkout upstream/main -- crates/warpui/src/...   # then review + commit
+git checkout upstream/master -- crates/warpui/src/...   # then review + commit
 ```
 
 ### 4. What NOT to do
-- **No continuous `git merge upstream/main`** into `main` — it drags the entire
+- **No continuous `git merge upstream/master`** into `main` — it drags the entire
   AI/cloud layer back and conflicts with every deletion.
 - **No `git rebase` of the whole fork** onto upstream once divergence is large.
 
@@ -147,7 +153,7 @@ git checkout upstream/main -- crates/warpui/src/...   # then review + commit
 1. **Define the path split now** (tracked vs owned) and let it govern the de-Warp:
    strip in the `app/` layer + via feature flags; keep terminal-core crates close
    to upstream.
-2. **Add `upstream` remote + an `upstream-main` mirror; track `last_synced_sha`.**
+2. **Add `upstream` remote (done); track `last_synced_sha`; cherry-pick from `upstream/master`.**
 3. **Sync by cherry-pick / path-scoped pull of tracked paths only** — never a full
    merge. Drive selection from the changelog.
 4. **Monthly cadence + security fast-track; test after every sync.**

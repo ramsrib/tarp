@@ -25,8 +25,8 @@ if [ "$WARP_CHANNEL" = "local" ]; then
     WARP_APP_PATH="target/debug/bundle/osx/WarpLocal.app"
     WARP_SCHEME_NAME="warplocal"
 else
-    WARP_APP_PATH="target/debug/bundle/osx/WarpOss.app"
-    WARP_SCHEME_NAME="warposs"
+    WARP_APP_PATH="target/debug/bundle/osx/Tarp.app"
+    WARP_SCHEME_NAME="tarp"
 fi
 DONT_OPEN=false
 # Launches the binary with "open", meaning the Warp process is
@@ -62,7 +62,7 @@ while (( "$#" )); do
       if [ "$WARP_CHANNEL" = "local" ]; then
           WARP_APP_PATH="target/release/bundle/osx/WarpLocal.app"
       else
-          WARP_APP_PATH="target/release/bundle/osx/WarpOss.app"
+          WARP_APP_PATH="target/release/bundle/osx/Tarp.app"
       fi
       PARAMS="$PARAMS $1"
       shift
@@ -73,7 +73,7 @@ while (( "$#" )); do
       if [ "$WARP_CHANNEL" = "local" ]; then
           WARP_APP_PATH="target/${PROFILE}/bundle/osx/WarpLocal.app"
       else
-          WARP_APP_PATH="target/${PROFILE}/bundle/osx/WarpOss.app"
+          WARP_APP_PATH="target/${PROFILE}/bundle/osx/Tarp.app"
       fi
       PARAMS="$PARAMS --profile $PROFILE"
       ;;
@@ -138,10 +138,10 @@ if [ "$DONT_OPEN" = false ] ; then
         if [ "$WARP_CHANNEL" = "local" ]; then
             LOG_FILE=~/Library/Logs/warp_local.log
         elif [ "$WARP_CHANNEL" = "oss" ]; then
-            LOG_FILE=~/Library/Logs/warp-oss.log
+            LOG_FILE=~/Library/Logs/tarp.log
         else
             echo "Warning: unrecognized WARP_CHANNEL '$WARP_CHANNEL', defaulting to OSS log path" >&2
-            LOG_FILE=~/Library/Logs/warp-oss.log
+            LOG_FILE=~/Library/Logs/tarp.log
         fi
         tail -F "$LOG_FILE"
     else

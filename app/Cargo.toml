@@ -1,7 +1,7 @@
 [package]
 authors = ["Warp Team <dev@warp.dev>"]
-default-run = "warp-oss"
-description = "The cloud-backed terminal for individuals and teams"
+default-run = "tarp"
+description = "Tarp — a plain, fast terminal"
 edition = "2021"
 autobins = false
 name = "warp"
@@ -18,7 +18,7 @@ path = "src/lib.rs"
 # flag overrides). Otherwise these binaries are exactly identical to our main binary.
 
 [[bin]]
-name = "warp-oss"
+name = "tarp"
 path = "src/bin/oss.rs"
 test = false
 
@@ -872,11 +872,11 @@ cloud_mode_input_v2 = ["cloud_mode"]
 handoff_cloud_cloud = ["cloud_mode_setup_v2"]
 git_credential_refresh = []
 
-[package.metadata.bundle.bin.warp-oss]
+[package.metadata.bundle.bin.tarp]
 category = "public.app-category.developer-tools"
 copyright = "© 2026 The Tarp Authors. Portions © 2020-2026 Denver Technologies, Inc."
 identifier = "dev.tarp.Tarp"
-name = "WarpOss"
+name = "Tarp"
 resources = ["assets/onboarding"]
 icon = ["channels/oss/icon/no-padding/512x512.png", "channels/oss/icon/no-padding/icon.ico"]
 short_description = "Tarp — a plain, fast terminal (a fork of Warp with AI, cloud, and accounts removed)."

@@ -78,3 +78,28 @@ purity justifies the cost.
 **Supersedes:** the earlier implicit assumption (Wave 0 / `05-removal-map.md`) that
 de-Warp meant deleting the AI/cloud crates up front. Those removal specs remain
 valid as the blueprint *if/when* full deletion is undertaken.
+
+## ADR-006 — Branch model: `main` + `upstream` remote + `fork-base` tag
+**Decision (2026-06-05):**
+- **`main`** is Tarp's development branch and default (renamed from the working
+  `dewarp` branch — its 15 commits *are* the mainline).
+- **Upstream is a remote, not a maintained branch.** `upstream` →
+  `https://github.com/warpdotdev/warp.git` (upstream's default branch is `master`).
+  Sync by cherry-picking / path-scoped pulls from the **`upstream/master`
+  remote-tracking ref** after `git fetch upstream` — no hand-maintained local mirror.
+- **`fork-base`** tag marks the exact fork point (`2bb3a04b`) so the baseline is
+  permanent and diffable.
+- The old local `master` (pristine Warp snapshot) was deleted as redundant: it's an
+  ancestor of `main`, preserved by the `fork-base` tag, and re-obtainable as
+  `upstream/master`.
+
+**Why:** standard `main` convention for our own dev; a remote-tracking ref is
+cleaner and less error-prone than a local mirror branch you can accidentally commit
+to; the tag guarantees the baseline never gets lost. Implements the sync strategy in
+ADR-003 / `08-upstream-sync.md`.
+
+**Remote steps (deferred — outward-facing, owner action):** push `main`
+(`git push -u origin main`), set GitHub's default branch to `main`
+(`gh repo edit --default-branch main`), delete `origin/master`
+(`git push origin --delete master`), push the tag (`git push origin fork-base`).
+Nothing has been pushed yet; the repo's remote still has `master` as default.

@@ -51,7 +51,7 @@ impl SettingsWidget for AboutPageWidget {
     type View = AboutPageView;
 
     fn search_terms(&self) -> &str {
-        "about warp version"
+        "about tarp version"
     }
 
     fn render(
@@ -115,9 +115,20 @@ impl SettingsWidget for AboutPageWidget {
                 .with_child(version_row.finish())
                 .with_child(
                     ui_builder
-                        .span("Copyright 2026 Warp")
+                        .span("Tarp")
                         .build()
                         .with_margin_top(16.)
+                        .finish(),
+                )
+                .with_child(
+                    ui_builder
+                        .span(
+                            "© 2026 The Tarp Authors. \
+                             Portions © 2020-2026 Denver Technologies, Inc.",
+                        )
+                        .with_soft_wrap()
+                        .build()
+                        .with_margin_top(8.)
                         .finish(),
                 )
                 .finish(),

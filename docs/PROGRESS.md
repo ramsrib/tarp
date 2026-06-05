@@ -8,6 +8,30 @@ Companion to [`../TARP-PLAN.md`](../TARP-PLAN.md) (the plan) and
 
 ## 2026-06-05
 
+### M3 — branding (Warp → Tarp), identity rename  ✅ verified (branch `dewarp`)
+Decisions used (autonomous, per ADR-001): namespace `dev.tarp.Tarp`; keep the
+channel enum, rename only the Oss arm (low divergence per ADR-003); placeholder
+icon (real art deferred). Savepoints, each committed:
+- `b2df3773` SP1 — bundle metadata: `dev.warp.WarpOss`→`dev.tarp.Tarp`, Tarp
+  copyright (Denver kept per AGPL), plain-terminal description.
+- `ca9b7d77` SP2 — `warp_core` Oss arm runtime identity: `AppId(dev/tarp/Tarp)`,
+  url scheme `tarp` (tracked-crate edit, Oss arm only).
+- `104ea11c` SP3 — binary `warp-oss`→`tarp`, app `WarpOss.app`→`Tarp.app`
+  (`default-run`, `[[bin]]`, bundle metadata key) + all platform bundle/run scripts.
+- `9c40fc96` SP4 — `.desktop`→`dev.tarp.Tarp.desktop`, `about.hbs`→Tarp.
+- **Verified on macOS:** builds green, bundles **Tarp.app** (`CFBundleIdentifier
+  dev.tarp.Tarp`, name Tarp), launches as **Tarp** (process `…/MacOS/tarp` +
+  terminal-server child), quits clean.
+
+**M3 remaining / TODO:**
+- ⚠ **Icon is still Warp's art** (`app/channels/oss/icon/…`) — needs real Tarp logo
+  artwork (can't generate). **Must replace before public release (trademark).**
+- Log file still named `warp-oss.log` (derived, not from channel `logfile_name`;
+  source not the channel config). Minor; trace + rename to `tarp.log` later.
+- User-facing "Warp" strings (window title, About, menus) + `warp.dev` help URLs +
+  `authors = ["Warp Team <dev@warp.dev>"]` — large surface (~185 files, much in
+  disabled AI/cloud code). Do the visible ones; bulk can follow.
+
 ### Strategy decision: disable-first, ship early (ADR-005)  ✅ decided
 - **Decided (user):** reach the no-AI/no-cloud terminal for v1 by **disabling**
   (minimal default feature set), not deleting AI/cloud source. Pivot to **branding

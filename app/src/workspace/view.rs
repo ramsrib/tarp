@@ -19684,24 +19684,7 @@ impl Workspace {
             }
         }
 
-        // Legacy AI assistant button (non-agent-mode only)
-        if is_online
-            && !FeatureFlag::AgentMode.is_enabled()
-            && !is_web_anonymous_user
-            && !self.current_workspace_state.is_ai_assistant_panel_open
-        {
-            target.add_child(
-                Container::new(
-                    SavePosition::new(
-                        self.render_legacy_warp_ai_entrypoint_button(appearance),
-                        AI_ASSISTANT_BUTTON_ID,
-                    )
-                    .finish(),
-                )
-                .with_margin_left(TAB_BAR_PADDING_LEFT)
-                .finish(),
-            );
-        }
+        // Tarp: no AI — the legacy "Warp AI" header entrypoint button is removed.
 
         if FeatureFlag::AvatarInTabBar.is_enabled() {
             target.add_child(
@@ -19710,14 +19693,7 @@ impl Workspace {
                     .finish(),
             );
         } else {
-            let resource_center_closed = !self.current_workspace_state.is_resource_center_open;
-            if resource_center_closed && ContextFlag::WarpEssentials.is_enabled() {
-                target.add_child(
-                    Container::new(self.render_resource_center_button(appearance, ctx))
-                        .with_margin_left(TAB_BAR_PADDING_LEFT)
-                        .finish(),
-                );
-            }
+            // Tarp: the "Warp Essentials" resource-center header button is removed.
 
             target.add_child(
                 Container::new(self.render_settings_button(appearance))
@@ -20087,6 +20063,7 @@ impl Workspace {
         SavePosition::new(Align::new(button).finish(), USER_AVATAR_BUTTON_POSITION_ID).finish()
     }
 
+    #[allow(dead_code)] // Tarp: "Warp Essentials" header button removed.
     fn render_resource_center_button(
         &self,
         appearance: &Appearance,
@@ -20275,6 +20252,7 @@ impl Workspace {
         Align::new(hoverable.finish()).finish()
     }
 
+    #[allow(dead_code)] // Tarp: "Warp AI" header button removed.
     fn render_legacy_warp_ai_entrypoint_button(&self, appearance: &Appearance) -> Box<dyn Element> {
         let (icon, action, label) = (
             icons::Icon::AiAssistant,

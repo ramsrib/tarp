@@ -63,12 +63,6 @@ impl SettingsWidget for AboutPageWidget {
         let theme = appearance.theme();
         let ui_builder = appearance.ui_builder();
 
-        let image_path = if theme.inferred_color_scheme() == ColorScheme::LightOnDark {
-            "bundled/svg/warp-logo-with-light-title.svg"
-        } else {
-            "bundled/svg/warp-logo-with-dark-title.svg"
-        };
-
         let version = ChannelState::app_version().unwrap_or("v#.##.###");
 
         let version_text = ui_builder
@@ -100,26 +94,15 @@ impl SettingsWidget for AboutPageWidget {
         Align::new(
             Flex::column()
                 .with_cross_axis_alignment(CrossAxisAlignment::Center)
-                .with_child(
-                    ConstrainedBox::new(
-                        Image::new(
-                            AssetSource::Bundled { path: image_path },
-                            CacheOption::BySize,
-                        )
-                        .finish(),
-                    )
-                    .with_max_height(100.)
-                    .with_max_width(350.)
-                    .finish(),
-                )
-                .with_child(version_row.finish())
+                // Tarp: Warp wordmark SVG removed; the "Tarp" text below is the
+                // wordmark until a Tarp logo asset is added.
                 .with_child(
                     ui_builder
                         .span("Tarp")
                         .build()
-                        .with_margin_top(16.)
                         .finish(),
                 )
+                .with_child(version_row.finish())
                 .with_child(
                     ui_builder
                         .span(

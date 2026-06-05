@@ -1,8 +1,9 @@
-use warpui::assets::asset_cache::AssetSource;
 use warpui::elements::{
-    Align, CacheOption, ConstrainedBox, Container, CrossAxisAlignment, Element, Flex, Image,
-    MainAxisAlignment, MouseStateHandle, ParentElement, Wrap,
+    CacheOption, ConstrainedBox, Container, CrossAxisAlignment, Element, Flex, Image,
+    MainAxisAlignment, MainAxisSize, MouseStateHandle, ParentElement, Text, Wrap,
 };
+use warpui::assets::asset_cache::AssetSource;
+use warp_core::ui::theme::color::internal_colors;
 use warpui::ui_components::components::UiComponent;
 use warpui::{AppContext, Entity, View, ViewContext, ViewHandle};
 
@@ -13,7 +14,6 @@ use super::settings_page::{
 use super::SettingsSection;
 use crate::appearance::Appearance;
 use crate::channel::ChannelState;
-use crate::themes::theme::ColorScheme;
 use crate::workspace::WorkspaceAction;
 
 pub struct AboutPageView {
@@ -91,32 +91,64 @@ impl SettingsWidget for AboutPageWidget {
                     .finish(),
             ]);
 
-        Align::new(
-            Flex::column()
-                .with_cross_axis_alignment(CrossAxisAlignment::Center)
-                // Tarp: Warp wordmark SVG removed; the "Tarp" text below is the
-                // wordmark until a Tarp logo asset is added.
-                .with_child(
-                    ui_builder
-                        .span("Tarp")
-                        .build()
-                        .finish(),
-                )
-                .with_child(version_row.finish())
-                .with_child(
-                    ui_builder
-                        .span(
-                            "© 2026 The Tarp Authors. \
-                             Portions © 2020-2026 Denver Technologies, Inc.",
-                        )
-                        .with_soft_wrap()
-                        .build()
-                        .with_margin_top(8.)
-                        .finish(),
-                )
-                .finish(),
+        // Tarp logo (the app icon), centered above the name.
+        let logo = ConstrainedBox::new(
+            Image::new(
+                AssetSource::Bundled {
+                    path: "bundled/svg/tarp-logo.png",
+                },
+                CacheOption::BySize,
+            )
+            .finish(),
         )
-        .finish()
+        .with_max_height(96.)
+        .with_max_width(96.)
+        .finish();
+
+        let name_and_version = Flex::column()
+            .with_cross_axis_alignment(CrossAxisAlignment::Center)
+            .with_child(logo)
+            .with_child(
+                Container::new(ui_builder.span("Tarp").build().finish())
+                    .with_margin_top(16.)
+                    .finish(),
+            )
+            .with_child(version_row.finish())
+            .finish();
+
+        // Subtle legal footer pinned to the bottom. The "portions © … Denver
+        // Technologies, Inc." notice is REQUIRED by AGPL/MIT and must remain
+        // (see docs/REMOVED.md).
+        let legal_footer = Container::new(
+            ConstrainedBox::new(
+                Text::new(
+                    "Tarp — a fork of Warp. AGPL-3.0 / MIT. \
+                     © 2026 Tarp Project; \
+                     portions © 2020-2026 Denver Technologies, Inc."
+                        .to_string(),
+                    appearance.ui_font_family(),
+                    appearance.ui_font_size() - 2.0,
+                )
+                .with_color(internal_colors::fg_overlay_6(theme).into())
+                .finish(),
+            )
+            .with_max_width(520.)
+            .finish(),
+        )
+        .with_margin_bottom(14.)
+        .finish();
+
+        // Full-height column: empty top spacer + centered name/version + footer.
+        // SpaceBetween pushes the footer to the bottom while keeping the name
+        // roughly centered above it.
+        Flex::column()
+            .with_main_axis_size(MainAxisSize::Max)
+            .with_main_axis_alignment(MainAxisAlignment::SpaceBetween)
+            .with_cross_axis_alignment(CrossAxisAlignment::Center)
+            .with_child(Flex::column().finish())
+            .with_child(name_and_version)
+            .with_child(legal_footer)
+            .finish()
     }
 }
 

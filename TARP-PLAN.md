@@ -213,13 +213,21 @@ reverse-dependencies before deleting a crate.
 
 ## 6. Suggested sequencing (milestones)
 
+> **Strategy pivot (2026-06-05, [ADR-005](docs/DECISIONS.md)):** v1 reaches the
+> no-AI/no-cloud terminal by **disabling** those surfaces (minimal default feature
+> set), not by deleting their source. Full AI+cloud source deletion is deferred to
+> an optional later project (it's a ~600–700-file coordinated surgery with high
+> upstream divergence — see [`docs/removal/ai-removal-feasibility.md`](docs/removal/ai-removal-feasibility.md)).
+> So M2 is reinterpreted as "features disabled," and the path to release is M3→M4.
+
 - **M0 — Hygiene**: WS0 branch rename + README/license/CoC swap. (small, fast)
-- **M1 — Green baseline**: ✅ **done** — unmodified build verified, `WarpOss.app` bundles + launches (Metal renderer, logged-out), documented in [`BUILD.md`](BUILD.md).
-- **M2 — Stripped build**: WS2 AI/cloud/accounts removed, still builds & runs.
-- **M3 — Tarp brand**: WS3 rename + icons; artifact says "Tarp" everywhere.
+- **M1 — Green baseline**: ✅ **done** — unmodified build verified, `WarpOss.app` bundles + launches, documented in [`BUILD.md`](BUILD.md).
+- **M2 — De-Warped build (disable)**: ✅ **substantially done** — minimal default feature set (187→49) disables AI/cloud/editor; `voice_input` deleted; builds + launches. Full source deletion deferred (ADR-005).
+- **M3 — Tarp brand**: WS3 rename + icons; artifact says "Tarp" everywhere. ← **next**
 - **M4 — First release**: WS4 + WS5 GitHub Release with installable artifacts + clean license attribution.
 - **M5 — Open for contributors**: WS6 docs, templates, CI.
+- **M6 (optional, later)** — full AI+cloud **source deletion** per the `docs/removal/` specs, if the binary-size / source-purity win justifies the effort + divergence.
 
 ---
 
-*Generated as a planning artifact; no source changes made.*
+*Plan doc; the code work lives on branch `dewarp`. See [`docs/PROGRESS.md`](docs/PROGRESS.md) for the work log and [`docs/DECISIONS.md`](docs/DECISIONS.md) for rationale.*

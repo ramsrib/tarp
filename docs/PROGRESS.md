@@ -8,6 +8,18 @@ Companion to [`../TARP-PLAN.md`](../TARP-PLAN.md) (the plan) and
 
 ## 2026-06-05
 
+### Strategy decision: disable-first, ship early (ADR-005)  ✅ decided
+- **Decided (user):** reach the no-AI/no-cloud terminal for v1 by **disabling**
+  (minimal default feature set), not deleting AI/cloud source. Pivot to **branding
+  (M3) + first release (M4)** on the current `dewarp` base. Full source deletion is
+  an optional later project (M6).
+- **Reasoning recorded** in [`DECISIONS.md`](DECISIONS.md) ADR-005: the disabled
+  state already meets the user-facing goal; deletion is a ~600–700-file coordinated
+  AI+cloud surgery with high upstream divergence (fights ADR-003 sync); ship-early
+  matches the release cadence. Removed items stay restorable via REMOVED.md.
+- **Next:** M3 — Warp→Tarp branding (bundle ids, app name, icons, strings, shell
+  integration) per [`removal/branding-map.md`](removal/branding-map.md).
+
 ### Wave 2 — step 4: AI engine-removal feasibility investigation  ✅ finding
 - Investigated the "engine-only" middle path the user picked. **Verdict: it doesn't
   exist as a smaller option.** The `ai::` refs are `crate::ai::` (app's internal

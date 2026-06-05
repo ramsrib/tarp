@@ -8,6 +8,26 @@ Companion to [`../TARP-PLAN.md`](../TARP-PLAN.md) (the plan) and
 
 ## 2026-06-05
 
+### UI sweep: strip AI/account/cloud chrome  ✅ (merged `cd9a8c66`)
+Worktree-agent pass (5 area commits `792254c7`..`cd9a8c66`), build green, merged:
+- **Settings tabs**: nav now terminal-only (Appearance, Features, Keyboard, Shared
+  blocks, Privacy, About) — removed Account/Agents/Cloud/Teams/Referrals/Warpify/
+  Drive; default section → Appearance.
+- **About**: Tarp wordmark + fork copyright (logo SVG still Warp — asset TODO).
+- **Privacy + links** (`util/links.rs`): warp.dev → the Tarp repo.
+- **Header**: removed Warp AI, Code review, Warp Essentials toolbar/tab-bar items.
+- **Sidebar**: left panel = Global Search only (dropped Project Explorer, Warp
+  Drive, conversation list).
+- **Footer/input AI** (mode switcher, model selector, A/@): **deferred** — verified
+  gated on `agent_view`/`agent_mode` (not in default) so inert/not-rendered when
+  logged-out; excising the residual code risks the command input. Left as-is.
+- Earlier same session: tab-bar Sign up button, Login-for-AI banner removed; vim
+  prompt "Warp's"→"Tarp's" (`55e79cd8`).
+- **Remaining AI residue (follow-up, task #20):** "Ask Warp AI" context-menu items
+  (`terminal/view.rs`, `init.rs`), workflow "Generate title with Warp AI"
+  (`workflow_view.rs`), the Warp wordmark SVG, and dropping construction of the
+  now-hidden settings pages + input-footer code residue.
+
 ### Test bug: account "Welcome/Sign up" modal on launch  ✅ fixed (`53d4d778`)
 - First run showed Warp's account onboarding modal (Sign up / Sign in / Skip).
   Cause: `RootView::new` fell through to `AuthOnboardingState::Auth` because

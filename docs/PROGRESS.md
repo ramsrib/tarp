@@ -8,6 +8,17 @@ Companion to [`../TARP-PLAN.md`](../TARP-PLAN.md) (the plan) and
 
 ## 2026-06-05
 
+### M0 — repo hygiene (partial)  ✅ in progress (branch `dewarp`)
+- `a0c614c3` — rewrote `README.md` for Tarp (dropped Warp's Oz/cloud/careers/Slack
+  sections + product imagery; added affiliation disclaimer, Tarp build commands,
+  AGPL/MIT + fork attribution); added `NOTICE` (dual copyright per ADR-002).
+- `7b437e9e` — de-Warped `SECURITY.md` + `CODE_OF_CONDUCT.md` contacts (point at the
+  Tarp repo / GitHub private advisory instead of warp.dev addresses).
+- **M0 remaining:** `CONTRIBUTING.md` rewrite (still Warp/Oz-oriented), prune the
+  ~15 Warp-internal CI workflows, issue/PR templates, `dependabot.yml`. Branch
+  rename `master`→`main` + any pushing is **deferred** (outward-facing; needs the
+  owner / `gh`, not done autonomously).
+
 ### M3 — branding (Warp → Tarp), identity rename  ✅ verified (branch `dewarp`)
 Decisions used (autonomous, per ADR-001): namespace `dev.tarp.Tarp`; keep the
 channel enum, rename only the Oss arm (low divergence per ADR-003); placeholder

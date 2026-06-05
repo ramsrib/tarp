@@ -1281,11 +1281,11 @@ impl SettingsView {
         // surfaces are removed from the settings sidebar. Only terminal-relevant
         // pages are listed.
         let mut nav_items = vec![
+            // Tarp: plain terminal — no Privacy (no telemetry/cloud) or Shared
+            // blocks (no sharing) settings pages.
             SettingsNavItem::Page(SettingsSection::Appearance),
             SettingsNavItem::Page(SettingsSection::Features),
             SettingsNavItem::Page(SettingsSection::Keybindings),
-            SettingsNavItem::Page(SettingsSection::SharedBlocks),
-            SettingsNavItem::Page(SettingsSection::Privacy),
             SettingsNavItem::Page(SettingsSection::About),
         ];
 

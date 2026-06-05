@@ -8,6 +8,24 @@ Companion to [`../TARP-PLAN.md`](../TARP-PLAN.md) (the plan) and
 
 ## 2026-06-05
 
+### Test install + first real bug fix  ✅ (`c687f620`)
+- Installed Tarp.app to `/Applications` for testing. First launch **crashed on
+  foreground** (debug build): `app_menus.rs` built menu items for disabled-feature
+  actions (e.g. `ToggleConversationListView`) whose descriptions are absent →
+  upstream `debug_assert!` in `default_name()` panicked (release would not, it
+  compiles the assert out).
+- **Fix:** `default_name()` no longer panics; dropped the whole **AI** and **Drive**
+  (cloud) menus from the menu bar (removed features) + stray View-menu items
+  (`ToggleWarpDrive`, `ToggleConversationListView`). Verified Tarp.app launches and
+  stays up with 0 panics.
+- This is the expected class of "non-cfg-gated edge surfaced by disabling features"
+  (A8 warned of it). More may surface on deeper interaction; the non-panic fallback
+  means they degrade gracefully (a stray "<NO DESCRIPTION>" item at worst) instead
+  of crashing — mop up as found.
+- Note: also kicked off then **killed** a background release build (it saturated CPU
+  and starved the debug app — that was the rustc spike). Build release only when
+  idle, or accept the debug build for testing.
+
 ### M3 — app icon replaced (release blocker cleared)  ✅ (`f395c1cc`)
 - User supplied two candidates (`~/Desktop/tarp-{1,2}.png`); chose **tarp-2** (tarp
   peeled back to reveal a green terminal) — better concept fit, contrast, and

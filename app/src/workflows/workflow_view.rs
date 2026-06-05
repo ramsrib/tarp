@@ -2414,11 +2414,9 @@ impl WorkflowView {
 
         let mut button_row = Flex::row();
 
-        let label_and_icon = match self.ai_metadata_assist_state {
-            AiAssistState::PreRequest => Some((AI_ASSIST_BUTTON_TEXT, Icon::AiAssistant)),
-            AiAssistState::RequestInFlight => Some((AI_ASSIST_LOADING_TEXT, Icon::Refresh)),
-            AiAssistState::Generated => None,
-        };
+        // Tarp: the "Generate a title, descriptions, or parameters with Warp AI"
+        // workflow affordance is removed.
+        let label_and_icon: Option<(&str, Icon)> = None;
 
         if let Some((label, icon)) = label_and_icon {
             // AI-generated workflow metadata is only supported for Command workflows currently.

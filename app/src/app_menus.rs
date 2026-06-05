@@ -69,8 +69,7 @@ pub fn menu_bar(ctx: &mut AppContext) -> MenuBar {
         make_new_view_menu(ctx),
         make_new_tab_menu(ctx),
         make_new_blocks_menu(ctx),
-        make_new_ai_menu(ctx),
-        make_new_drive_menu(ctx),
+        // Tarp: the "AI" and "Drive" (cloud) menus are for removed features — omitted.
         make_new_window_menu(),
         make_new_help_menu(),
     ])
@@ -101,7 +100,9 @@ fn custom_shortcut(action: CustomAction) -> Option<Keystroke> {
 fn default_name(action: CustomAction, ctx: &AppContext) -> String {
     ctx.description_for_custom_action(action.into(), bindings::MAC_MENUS_CONTEXT)
         .unwrap_or_else(|| {
-            debug_assert!(false, "action should have a name: {action:?}");
+            // Tarp: actions gated behind disabled features (AI/cloud/etc.) have no
+            // registered description. Don't panic (upstream debug_assert'd here);
+            // dead menu items for removed features are pruned from the menus below.
             "<NO DESCRIPTION>".into()
         })
 }
@@ -376,14 +377,12 @@ fn make_new_edit_menu(ctx: &AppContext) -> Menu {
 
 fn make_new_view_menu(ctx: &AppContext) -> Menu {
     let mut items = vec![
-        updateable_custom_item_without_checkmark(CustomAction::ToggleWarpDrive, ctx),
-        MenuItem::Separator,
+        // Tarp: ToggleWarpDrive (cloud) and ToggleConversationListView (AI) removed.
         updateable_custom_item_without_checkmark(CustomAction::CommandPalette, ctx),
         updateable_custom_item_without_checkmark(CustomAction::NavigationPalette, ctx),
         updateable_custom_item_without_checkmark(CustomAction::LaunchConfigPalette, ctx),
         updateable_custom_item_without_checkmark(CustomAction::FilesPalette, ctx),
         updateable_custom_item_without_checkmark(CustomAction::ToggleProjectExplorer, ctx),
-        updateable_custom_item_without_checkmark(CustomAction::ToggleConversationListView, ctx),
         updateable_custom_item_without_checkmark(CustomAction::ToggleGlobalSearch, ctx),
         MenuItem::Separator,
         updateable_custom_item_without_checkmark(CustomAction::History, ctx),
@@ -513,6 +512,7 @@ fn make_new_tab_menu(ctx: &AppContext) -> Menu {
     Menu::new("Tab", items)
 }
 
+#[allow(dead_code)] // Tarp: AI menu omitted from the menu bar (removed feature)
 fn make_new_ai_menu(ctx: &AppContext) -> Menu {
     let mut items = vec![updateable_custom_item_without_checkmark(
         CustomAction::NewAgentModePane,
@@ -584,6 +584,7 @@ fn make_new_blocks_menu(ctx: &AppContext) -> Menu {
     Menu::new("Blocks", items)
 }
 
+#[allow(dead_code)] // Tarp: Drive (cloud) menu omitted from the menu bar (removed feature)
 fn make_new_drive_menu(ctx: &AppContext) -> Menu {
     let mut items = vec![
         updateable_custom_item_without_checkmark(CustomAction::NewPersonalWorkflow, ctx),

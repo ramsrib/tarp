@@ -37,6 +37,18 @@ feature-flag selection* — `cargo build -p warp --features release_bundle`
 edits required for a working no-op. The full removal below is about deleting the
 now-dead code and the build/bundle/script machinery, not about making it "off".
 
+> **⚠ Correction (2026-06-05, verified during execution):** Group A's "delete
+> `app/src/server/telemetry/` wholesale while the ~774 `send_telemetry_from_ctx!`
+> calls keep compiling" is **not** achievable in isolation. The `TelemetryEvent`
+> enum is defined in `app/src/server/telemetry/events.rs:1262`, and call sites use
+> `TelemetryEvent::Variant` — there are **157+ references to
+> `server::telemetry::events`** across `app/src`. Deleting `events.rs` breaks all of
+> them. **Therefore telemetry code deletion is NOT a standalone step; it rides along
+> with the feature removals (AI/cloud/sharing/onboarding/code-editor) that own those
+> call sites.** The achieved telemetry state for now is **Phase 1 (no-op baseline)**,
+> which is real and verified: the OSS channel dials nothing. Group A/B below should
+> be executed incrementally as each owning surface is removed, not up front.
+
 The two-phase strategy the removal-map calls for is therefore:
 1. **Phase 1 (stub to no-op):** already achieved by the OSS channel +
    not enabling `crash_reporting`/`cocoa_sentry`. Verify, lock it in, then

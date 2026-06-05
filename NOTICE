@@ -1,0 +1,32 @@
+Tarp
+====
+
+Tarp is an independent, community-maintained fork of Warp's open-source terminal
+client. It is not affiliated with, endorsed by, or sponsored by Warp or Denver
+Technologies, Inc. "Warp" is a trademark of its respective owner; Tarp uses the
+name only to truthfully describe its origin as a fork.
+
+Copyright and license
+---------------------
+
+Portions of this software are:
+
+    Copyright (C) 2020-2026 Denver Technologies, Inc.
+
+Modifications for Tarp are:
+
+    Copyright (C) 2026 The Tarp Authors.
+
+This program is free software licensed under the GNU Affero General Public
+License v3.0 (see LICENSE-AGPL), except for the `warpui` and `warpui_core`
+crates, which are licensed under the MIT License (see LICENSE-MIT). Upstream
+copyright notices are retained as required by those licenses.
+
+Third-party components are distributed under their own licenses; aggregated
+third-party license attribution is generated for distribution (see about.hbs /
+about.toml and the generated THIRD_PARTY_LICENSES in release artifacts).
+
+Upstream
+--------
+
+Warp's open-source client: https://github.com/warpdotdev/warp

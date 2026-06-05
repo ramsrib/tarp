@@ -14,10 +14,20 @@ Companion to [`../TARP-PLAN.md`](../TARP-PLAN.md) (the plan) and
   AGPL/MIT + fork attribution); added `NOTICE` (dual copyright per ADR-002).
 - `7b437e9e` — de-Warped `SECURITY.md` + `CODE_OF_CONDUCT.md` contacts (point at the
   Tarp repo / GitHub private advisory instead of warp.dev addresses).
-- **M0 remaining:** `CONTRIBUTING.md` rewrite (still Warp/Oz-oriented), prune the
-  ~15 Warp-internal CI workflows, issue/PR templates, `dependabot.yml`. Branch
-  rename `master`→`main` + any pushing is **deferred** (outward-facing; needs the
-  owner / `gh`, not done autonomously).
+- **M0 (tail) — done:**
+  - `506f6ba9` — pruned **18** Warp-internal workflows + CUT actions (docubot,
+    get_channel_config) + scripts/issue-triage/STAKEHOLDERS; replaced the 858-line
+    `ci.yml` with a minimal fmt-check + linux-build CI.
+  - `5c0cd5eb` — de-Warped `dependabot.yml` (dropped warpdotdev assignees/private
+    registry/namespace group) + fresh Tarp issue/PR templates (cut AI/Linear/SSH
+    /cherrypick/feature-flag variants).
+  - `<this>` — rewrote `CONTRIBUTING.md` for Tarp (scope, build→BUILD.md, workflow,
+    upstream-sync caution, licensing).
+- **M0 — branch rename DONE** (separate work): `main` is default on `origin`,
+  `master` deleted, `fork-base` tag + `upstream` remote set (ADR-006).
+- **M0 still open:** `WARP.md` (12 KB Warp engineering guide) + `FAQ.md` are still
+  Warp-branded — rewrite/retire later; bulk user-facing "Warp" strings (mostly in
+  disabled code).
 
 ### M3 — branding (Warp → Tarp), identity rename  ✅ verified (branch `dewarp`)
 Decisions used (autonomous, per ADR-001): namespace `dev.tarp.Tarp`; keep the

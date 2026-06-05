@@ -274,7 +274,7 @@ use crate::ai::blocklist::{
     PassiveSuggestionsModels, PendingAttachment, PendingQueryState, QueuedQuery, QueuedQueryId,
     QueuedQueryModel, QueuedQueryOrigin, RequestFileEditsFormatKind, ShellCommandExecutor,
     ShellCommandExecutorEvent, SlashCommandRequest, StartAgentExecutor, StartAgentExecutorEvent,
-    StartAgentRequest, ATTACH_AS_AGENT_MODE_CONTEXT_TEXT, PRE_REWIND_PREFIX,
+    StartAgentRequest, PRE_REWIND_PREFIX,
 };
 use crate::ai::conversation_details_panel::ConversationDetailsPanelEvent;
 use crate::ai::conversation_utils;
@@ -290,7 +290,7 @@ use crate::ai::predict::prompt_suggestions::{
     is_accept_prompt_suggestion_bound_to_cmd_enter,
     is_accept_prompt_suggestion_bound_to_ctrl_enter,
 };
-use crate::ai_assistant::{AskAIType, ASK_AI_ASSISTANT_TEXT};
+use crate::ai_assistant::AskAIType;
 use crate::antivirus::AntivirusInfo;
 use crate::appearance::{Appearance, AppearanceEvent};
 use crate::auth::auth_manager::AuthManager;
@@ -16504,25 +16504,8 @@ impl TerminalView {
                         ))
                         .into_item(),
                 ];
-                if AISettings::as_ref(ctx).is_any_ai_enabled(ctx) {
-                    fields.extend([
-                        MenuItem::Separator,
-                        MenuItemFields::new(if FeatureFlag::AgentMode.is_enabled() {
-                            *ATTACH_AS_AGENT_MODE_CONTEXT_TEXT
-                        } else {
-                            ASK_AI_ASSISTANT_TEXT
-                        })
-                        .with_on_select_action(TerminalAction::ContextMenu(
-                            ContextMenuAction::AskAI(if FeatureFlag::AgentMode.is_enabled() {
-                                AskAISource::SelectedTerminalText
-                            } else {
-                                AskAISource::SelectedBlockOrText
-                            }),
-                        ))
-                        .with_key_shortcut_label(Some("⌃ ⇧ Space"))
-                        .into_item(),
-                    ]);
-                }
+                // Tarp: the "Ask Warp AI" / attach-as-agent-context text
+                // right-click item is removed.
                 fields
             }
             (
@@ -16615,34 +16598,12 @@ impl TerminalView {
                         ))
                         .with_disabled(is_copy_commands_disabled)
                         .into_item(),
-                    MenuItemFields::new(share_block_label)
-                        .with_on_select_action(TerminalAction::ContextMenu(
-                            ContextMenuAction::OpenShareBlockModal {
-                                block_index: tail_block_index,
-                            },
-                        ))
-                        .with_key_shortcut_label(keybinding_name_to_display_string(
-                            "terminal:open_share_block_modal",
-                            ctx,
-                        ))
-                        .with_disabled(is_share_disabled)
-                        .into_item(),
                 ];
 
-                if FeatureFlag::CreatingSharedSessions.is_enabled()
-                    && ContextFlag::CreateSharedSession.is_enabled()
-                {
-                    // Sharing a session from a context menu is disabled for multi block selections, restored blocks, and viewers.
-                    let is_share_session_disabled = !is_single_selection
-                        || model
-                            .block_list()
-                            .block_at(tail_block_index)
-                            .is_none_or(|b| b.is_restored());
-
-                    items.extend(
-                        self.session_sharing_context_menu_items(&model, is_share_session_disabled),
-                    );
-                }
+                // Tarp: the "Share block..." / "Share session" context-menu
+                // entries (which open the cloud share / sign-up flow) are
+                // removed.
+                let _ = (&share_block_label, is_share_disabled);
 
                 if WarpDriveSettings::is_warp_drive_enabled(ctx) {
                     items.push(MenuItem::Separator);
@@ -16659,39 +16620,9 @@ impl TerminalView {
                     );
                 }
 
-                if AISettings::as_ref(ctx).is_any_ai_enabled(ctx) {
-                    if FeatureFlag::AgentMode.is_enabled() {
-                        // We can only attach selected blocks if the input box is visible.
-                        if self.is_input_box_visible(&model, ctx) {
-                            items.extend([
-                                MenuItem::Separator,
-                                MenuItemFields::new(*ATTACH_AS_AGENT_MODE_CONTEXT_TEXT)
-                                    .with_on_select_action(TerminalAction::ContextMenu(
-                                        ContextMenuAction::AskAI(AskAISource::SelectedBlocks),
-                                    ))
-                                    .with_key_shortcut_label(keybinding_name_to_display_string(
-                                        "terminal:ask_ai_assistant",
-                                        ctx,
-                                    ))
-                                    .into_item(),
-                            ]);
-                        }
-                    } else {
-                        items.extend([
-                            MenuItem::Separator,
-                            MenuItemFields::new("Ask Warp AI")
-                                .with_on_select_action(TerminalAction::ContextMenu(
-                                    ContextMenuAction::AskAI(AskAISource::SelectedBlockOrText),
-                                ))
-                                .with_key_shortcut_label(keybinding_name_to_display_string(
-                                    "terminal:ask_ai_assistant",
-                                    ctx,
-                                ))
-                                .with_disabled(is_ask_ai_disabled)
-                                .into_item(),
-                        ]);
-                    }
-                }
+                // Tarp: the "Ask Warp AI" / attach-as-agent-context block menu
+                // items are removed.
+                let _ = is_ask_ai_disabled;
 
                 if is_single_selection {
                     let mut copy_output_menu_item = MenuItemFields::new("Copy output")
@@ -16837,16 +16768,10 @@ impl TerminalView {
                 None,
                 true,
             ) => {
-                // If selection is empty, only show non-block related options
-                let mut items = Vec::new();
-
-                if FeatureFlag::CreatingSharedSessions.is_enabled()
-                    && ContextFlag::CreateSharedSession.is_enabled()
-                {
-                    items.extend(self.session_sharing_context_menu_items(&model, false));
-                }
-
-                items
+                // If selection is empty, only show non-block related options.
+                // Tarp: the "Share session" entry is removed, leaving no items
+                // for this empty-selection case.
+                Vec::new()
             }
             _ => vec![],
         };
@@ -17309,13 +17234,11 @@ impl TerminalView {
                 .into_item(),
         );
 
-        if FeatureFlag::CreatingSharedSessions.is_enabled()
-            && ContextFlag::CreateSharedSession.is_enabled()
-        {
-            items.extend(self.session_sharing_context_menu_items(&model, false));
-        }
+        // Tarp: the "Share session" context-menu entry (cloud share / sign-up
+        // flow) is removed.
 
-        // Section 2: AI Command Search, Ask Warp AI
+        // Section 2: Command search (plain). The AI command search and
+        // "Ask Warp AI" entries are removed.
         items.extend([
             MenuItem::Separator,
             MenuItemFields::new("Command search")
@@ -17329,31 +17252,6 @@ impl TerminalView {
                 .with_disabled(is_editor_disabled)
                 .into_item(),
         ]);
-
-        if AISettings::as_ref(ctx).is_any_ai_enabled(ctx) {
-            items.push(
-                MenuItemFields::new("AI command search")
-                    .with_on_select_action(TerminalAction::InputContextMenuItem(
-                        InputContextMenuAction::ShowAICommandSearch,
-                    ))
-                    .with_key_shortcut_label(keybinding_name_to_display_string(
-                        "input:toggle_natural_language_command_search",
-                        ctx,
-                    ))
-                    .with_disabled(is_editor_disabled)
-                    .into_item(),
-            );
-
-            if !selected_input_text.is_empty() && !FeatureFlag::AgentMode.is_enabled() {
-                items.push(
-                    MenuItemFields::new("Ask Warp AI")
-                        .with_on_select_action(TerminalAction::InputContextMenuItem(
-                            InputContextMenuAction::AskWarpAI,
-                        ))
-                        .into_item(),
-                );
-            }
-        }
 
         // Section 3: Teams related
         if !all_current_input_text.is_empty() && WarpDriveSettings::is_warp_drive_enabled(ctx) {
@@ -17530,28 +17428,11 @@ impl TerminalView {
                     .with_key_shortcut_label(Some("⌘-C"))
                     .into_item(),
             );
-            if AISettings::as_ref(ctx).is_any_ai_enabled(ctx) {
-                menu_items.extend([
-                    MenuItem::Separator,
-                    MenuItemFields::new(if FeatureFlag::AgentMode.is_enabled() {
-                        *ATTACH_AS_AGENT_MODE_CONTEXT_TEXT
-                    } else {
-                        ASK_AI_ASSISTANT_TEXT
-                    })
-                    .with_on_select_action(TerminalAction::ContextMenu(ContextMenuAction::AskAI(
-                        AskAISource::SelectedTerminalText,
-                    )))
-                    .with_key_shortcut_label(Some("⌃-⇧-Space"))
-                    .into_item(),
-                ]);
-            }
+            // Tarp: the "Ask Warp AI" / attach-as-agent-context alt-screen item
+            // is removed.
         }
 
-        if FeatureFlag::CreatingSharedSessions.is_enabled()
-            && ContextFlag::CreateSharedSession.is_enabled()
-        {
-            menu_items.extend(self.session_sharing_context_menu_items(&model, false));
-        }
+        // Tarp: the "Share session" alt-screen entry is removed.
         let current_shell = model.shell_launch_state().available_shell();
         let mut pane_context_menu_items = self.pane_context_menu_items(current_shell, ctx);
         if !menu_items.is_empty() && !pane_context_menu_items.is_empty() {

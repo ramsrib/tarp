@@ -21,6 +21,9 @@ has been changed; this is documentation only.
 | [`07-ci-and-release.md`](07-ci-and-release.md) | CI workflows, packaging scripts, release machinery — keep/cut/replace. |
 | [`08-upstream-sync.md`](08-upstream-sync.md) | How to selectively pull fixes/features from upstream Warp without inheriting the AI/cloud churn. |
 | [`09-parallel-execution-plan.md`](09-parallel-execution-plan.md) | Agent-driven execution: what parallelizes, the analysis fan-out, and the sequenced de-Warp surgery. |
+| [`DECISIONS.md`](DECISIONS.md) | Decision log (ADR-style) — the consequential calls and their rationale. |
+| [`REMOVED.md`](REMOVED.md) | Removed-features registry with restore pointers. |
+| [`PROGRESS.md`](PROGRESS.md) | Chronological work log. |
 
 The actionable, sequenced plan lives in [`../TARP-PLAN.md`](../TARP-PLAN.md).
 This doc set is the **evidence** behind that plan.

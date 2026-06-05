@@ -19550,7 +19550,14 @@ impl Workspace {
         let vertical_tabs_active =
             FeatureFlag::VerticalTabs.is_enabled() && *TabSettings::as_ref(ctx).use_vertical_tabs;
         let inner = match item {
-            HeaderToolbarItemKind::TabsPanel => self.render_left_toggle_button(appearance, ctx),
+            HeaderToolbarItemKind::TabsPanel => {
+                // Tarp: hide the left-sidebar toggle when there's nothing to show
+                // (no tools panel + not using vertical tabs).
+                if self.left_panel_views.is_empty() && !vertical_tabs_active {
+                    return None;
+                }
+                self.render_left_toggle_button(appearance, ctx)
+            }
             HeaderToolbarItemKind::ToolsPanel => {
                 if self.left_panel_views.is_empty() {
                     return None;
@@ -22063,19 +22070,12 @@ impl Workspace {
 
     /// Computes the list of available left panel views based on current AI settings and feature flags.
     fn compute_left_panel_views(ctx: &AppContext) -> Vec<ToolPanelView> {
-        // Tarp is a plain terminal: the left panel only exposes Global Search.
-        // Project Explorer (code-editor file tree), the agent Conversation list,
-        // and Warp Drive (cloud) are removed.
-        let mut views = vec![];
-        if cfg!(feature = "local_fs")
-            && FeatureFlag::GlobalSearch.is_enabled()
-            && *CodeSettings::as_ref(ctx).show_global_search.value()
-        {
-            views.push(ToolPanelView::GlobalSearch {
-                entry_focus: GlobalSearchEntryFocus::Results,
-            });
-        }
-        views
+        // Tarp is a plain terminal: the left tools panel is empty. Global Search
+        // (ripgrep file-content search) is removed along with Project Explorer
+        // (code-editor file tree), the agent Conversation list, and Warp Drive
+        // (cloud) — `rg`/`grep` in the shell covers project search.
+        let _ = ctx;
+        vec![]
     }
 
     /// Recomputes the available left panel views based on current AI settings and feature flags,

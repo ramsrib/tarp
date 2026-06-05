@@ -19,7 +19,6 @@ use crate::search::files::model::FileSearchModel;
 use crate::search::mixer::AddAsyncSourceOptions;
 use crate::search::QueryFilter;
 use crate::session_management::SessionSource;
-use crate::settings::AISettings;
 
 /// Store of all of the [`crate::search::DataSource`]s for the command palette.
 pub struct DataSourceStore {
@@ -93,18 +92,10 @@ impl DataSourceStore {
             );
 
             if WarpDriveSettings::is_warp_drive_enabled(ctx) {
-                let mut warp_drive_filters = HashSet::from([
-                    QueryFilter::Notebooks,
-                    QueryFilter::Plans,
-                    QueryFilter::Drive,
-                    QueryFilter::Workflows,
-                ]);
-
-                warp_drive_filters.insert(QueryFilter::EnvironmentVariables);
-
-                if AISettings::as_ref(ctx).is_any_ai_enabled(ctx) {
-                    warp_drive_filters.insert(QueryFilter::AgentModeWorkflows);
-                }
+                // Tarp: only the local Workflows source is registered; the
+                // cloud/AI Warp Drive sources (notebooks, plans, drive browse,
+                // environment variables, agent-mode workflows) are removed.
+                let warp_drive_filters = HashSet::from([QueryFilter::Workflows]);
                 mixer.add_sync_source(self.warp_drive_data_source.clone(), warp_drive_filters);
             }
 
@@ -141,13 +132,7 @@ impl DataSourceStore {
                 );
             }
 
-            // Add conversation search if AI is enabled
-            if AISettings::as_ref(ctx).is_any_ai_enabled(ctx) {
-                mixer.add_sync_source(
-                    self.all_conversation_data_source.clone(),
-                    HashSet::from([QueryFilter::Conversations]),
-                );
-            }
+            // Tarp: AI conversation search is removed from the command palette.
 
             mixer.add_sync_source(
                 self.repo_data_source.clone(),

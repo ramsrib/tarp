@@ -7,7 +7,6 @@ use std::sync::Arc;
 use pathfinder_color::ColorU;
 #[cfg(not(target_family = "wasm"))]
 use settings::Setting as _;
-use warp_core::features::FeatureFlag;
 use warp_core::ui::appearance::Appearance;
 use warp_core::ui::color::contrast::{
     foreground_color_with_minimum_contrast, MinimumAllowedContrast,
@@ -44,7 +43,7 @@ use crate::network::NetworkStatus;
 use crate::search::ai_context_menu::view::AIContextMenu;
 #[cfg(not(target_family = "wasm"))]
 use crate::settings::InputSettings;
-use crate::settings::{AISettings, AISettingsChangedEvent};
+use crate::settings::AISettings;
 use crate::settings_view::SettingsSection;
 use crate::terminal::input::MenuPositioningProvider;
 use crate::terminal::keys::TerminalKeybindings;
@@ -433,14 +432,9 @@ impl UniversalDeveloperInputButtonBar {
             me.handle_profile_model_selector_event(event, ctx);
         });
 
-        // Create segmented control options based on auto-detection setting
-        let ai_settings = AISettings::as_ref(ctx);
-        let is_autodetection_enabled = ai_settings.is_ai_autodetection_enabled(ctx);
-
         // Tarp: only the Terminal mode is offered; the Agent Mode / auto-detection
         // AI toggles are removed. Keep the single Terminal option so the `>_`
         // indicator still renders and command entry is unaffected.
-        let _ = is_autodetection_enabled;
         let options = vec![InputToggleMode::Terminal];
 
         let default_option = InputToggleMode::Terminal;

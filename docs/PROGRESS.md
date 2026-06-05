@@ -8,6 +8,28 @@ Companion to [`../TARP-PLAN.md`](../TARP-PLAN.md) (the plan) and
 
 ## 2026-06-05
 
+### Wave 2 — step 2: telemetry no-op baseline + entanglement findings  ✅ (analysis/correction)
+- **Telemetry Phase 1 (no-op) confirmed as the achieved state.** OSS channel
+  defaults to `telemetry_config: None` / `crash_reporting_config: None`; step-1
+  build (`--features gui`, excludes `crash_reporting`/`cocoa_sentry`) launched with
+  telemetry inert and dialed nothing. No code/tracked edits needed for "off".
+- **Key correction to the A3 spec:** Group A ("delete `app/src/server/telemetry/`
+  wholesale, keep the 774 calls compiling") is NOT standalone-achievable. The
+  `TelemetryEvent` enum lives in `events.rs:1262` and is referenced via
+  `TelemetryEvent::Variant` at 157+ sites across `app/src`. Telemetry code deletion
+  therefore **rides with the feature removals** (AI/cloud/sharing/onboarding/
+  code-editor) that own those call sites, not as an up-front cut. Spec updated.
+- **General finding:** removals are more entangled than the specs implied. E.g.
+  `voice_input` (already unwired from `gui`) still has 41 refs woven into the app
+  input-editor view (`app/src/editor/view/voice.rs` + state/rendering). Each
+  removal cascades; the big **AI removal** in particular is a large iterative
+  effort, best done in a focused worktree-isolated pass (per `docs/09` Wave 2),
+  not a quick deletion.
+- **Revised approach:** keep the feature-flag-reduced binary (step 1) as the stable
+  base; execute the heavy code/crate deletions as dedicated, individually-verified
+  passes (AI first/with code-editor, then cloud/accounts), each ending in the M1
+  smoke test + a commit.
+
 ### Wave 2 — step 1: minimal default feature set  ✅ (branch `dewarp`)
 - Created branch **`dewarp`** off `master` to keep `master` pristine (it doubles as
   the future upstream-sync mirror).

@@ -78,6 +78,14 @@ interactive testing; see [`PROGRESS.md`](PROGRESS.md) for the narrative.
 | Context menus | "Share session" (sign-up popup), "Ask Warp AI" (all builders) | `73a01f60` |
 | Workflow editor | "Generate title… with Warp AI" | `953a8d19` |
 | Vim banner | No longer auto-shown on launch (feature kept; enable via settings) | `2bb007b2` |
+| Debug build noise | Per-block memory-stats footer defaulted off; "(nld overridden)" prompt tag dropped | `093f6ba8` |
+| Native menu bar | App menu: About→Tarp, Set-Default→Tarp, title→Tarp; removed Toggle Resource Center, Invite People, Privacy Policy, Log out. Edit "Use Tarp's Prompt". Help: only GitHub Issues (Tarp repo). File: removed New Agent Tab. Tab right-click: removed Share session/Stop sharing | `1a889c4b` |
+
+> **Tracked-crate edit (logged for upstream-sync):** `crates/warpui/src/platform/mac/menus.rs` — "Hide Warp"/"Quit Warp" → "Hide Tarp"/"Quit Tarp" (hardcoded app-name in the standard menu items; justified branding). Only this one warpui string edit so far.
+
+> **Compliance — do NOT remove:** the About page "Portions © 2020-2026 Denver
+> Technologies, Inc." line is **required** by AGPL/MIT (upstream copyright notice).
+> It is correctly worded as a fork ("Portions ©" alongside "© The Tarp Authors").
 
 **Restore any row:** `git revert <commit>`.
 **Kept (decided terminal features):** working-directory picker, vim keybindings (via

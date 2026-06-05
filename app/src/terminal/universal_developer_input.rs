@@ -771,7 +771,9 @@ impl View for UniversalDeveloperInputButtonBar {
         #[cfg(feature = "voice_input")]
         let _is_voice_input_enabled = AISettings::as_ref(app).is_voice_input_enabled(app);
 
-        // Helper function to create a 1px vertical divider
+        // Helper function to create a 1px vertical divider (unused after Tarp
+        // removed the toolbar buttons; kept for minimal diff).
+        #[allow(unused_variables)]
         let create_divider = || {
             Container::new(
                 warpui::elements::ConstrainedBox::new(
@@ -788,34 +790,18 @@ impl View for UniversalDeveloperInputButtonBar {
 
         let build_buttons = |model_selector_element: Box<dyn warpui::Element>| {
             // Create a horizontal layout with buttons arranged in a row
+            // Tarp: every control in this toolbar row was an AI/agent affordance,
+            // so the row no longer adds any. Removed: the `>_` mode switcher
+            // (single-option/dead), `/` slash-command, `@` AI-context, the AI model
+            // selector, and the `+` file-attach (it attached files as AI conversation
+            // context). The command editor is a separate view, so typing/running
+            // commands is unaffected.
+            let _ = &model_selector_element;
+            #[allow(unused_mut)]
             let mut buttons = Flex::row()
                 .with_main_axis_size(MainAxisSize::Max)
                 .with_cross_axis_alignment(CrossAxisAlignment::Center)
-                .with_main_axis_alignment(MainAxisAlignment::Start)
-                .with_child(
-                    Container::new(ChildView::new(&self.segmented_control).finish())
-                        .with_padding_right(4.0)
-                        .finish(),
-                );
-            // Tarp: the AI affordances in this toolbar row are removed. Dropped:
-            //  - the `/` slash-command button (agent/AI slash commands)
-            //  - the `@` AI-context button
-            //  - the AI model selector dropdown
-            // Kept: the Terminal `>_` indicator (segmented_control) and the
-            // plain `+` file-attach button. The command editor is a separate
-            // view, so removing these does not affect typing/running commands.
-            let _ = &model_selector_element;
-
-            // Viewers cannot attach files in shared sessions at this point.
-            if !self
-                .terminal_model
-                .lock()
-                .shared_session_status()
-                .is_viewer()
-            {
-                buttons = buttons.with_child(create_divider());
-                buttons = buttons.with_child(ChildView::new(&self.file_button).finish());
-            }
+                .with_main_axis_alignment(MainAxisAlignment::Start);
 
             if !self.prompt_alert.as_ref(app).is_no_alert() {
                 buttons = buttons.with_child(

@@ -8,6 +8,27 @@ Companion to [`../TARP-PLAN.md`](../TARP-PLAN.md) (the plan) and
 
 ## 2026-06-05
 
+### UI sweep 2: input footer + palette + menus + vim banner  ✅ (merged `2bb007b2`)
+Second worktree-agent pass (`ff7e6951`..`2bb007b2`), build green, command input intact:
+- **Input bar** (the real one = `terminal/universal_developer_input.rs`, NOT the
+  agent_input_footer the prior agent checked): removed the **Agent Mode `A` toggle**,
+  the **AI model selector** ("auto (cost-efficient)"), the `@` AI-context and `/`
+  buttons. Kept `>_` terminal indicator + `+` file-attach. Editor/PTY paths untouched.
+- **Command palette**: dropped Warp Drive / Notebooks / Environment Variables /
+  Agent workflows / AI Conversations chips; kept Workflows / Files (local) / Actions
+  / Sessions / Launch configs.
+- **Context menus**: removed "Share session" (the sign-up popup) + "Ask Warp AI"
+  across all 4 menu builders.
+- **Workflow editor**: removed "Generate title… with Warp AI".
+- **Vim banner**: no longer auto-shown on launch (feature kept; enable via settings).
+- Also earlier: About Warp wordmark dropped; Privacy + Shared-blocks settings tabs
+  removed (`886d3a17`).
+- **Residue still compiled-in (not surfaced; later cleanup):** the alternate
+  `ai/blocklist/agent_view/agent_input_footer` path (used only if UDI is off /
+  CLI-agent sessions), "Save as workflow" drive item (gated on cloud), Ask-AI/Share
+  keybinding *registrations* (gated, not visible), and `ai`/`billing`/`pricing`/
+  `drive`/`voice` modules. Tracked for the deeper M6 deletion.
+
 ### UI sweep: strip AI/account/cloud chrome  ✅ (merged `cd9a8c66`)
 Worktree-agent pass (5 area commits `792254c7`..`cd9a8c66`), build green, merged:
 - **Settings tabs**: nav now terminal-only (Appearance, Features, Keyboard, Shared

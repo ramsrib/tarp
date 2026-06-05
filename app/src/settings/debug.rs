@@ -51,7 +51,9 @@ define_settings_group!(DebugSettings, settings: [
     },
     show_memory_stats: ShowMemoryStats {
         type: bool,
-        default: true,
+        // Tarp: default off — the per-block memory-stats footer is dogfood
+        // instrumentation, not something a normal terminal should show.
+        default: false,
         supported_platforms: SupportedPlatforms::ALL,
         sync_to_cloud: SyncToCloud::Never,
         private: true,

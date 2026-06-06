@@ -25,9 +25,24 @@ entails. Newest concerns first. See [`DECISIONS.md`](DECISIONS.md) for rationale
 
 ## Release engineering (M4)
 
-- ✅ **DONE — Tag-driven release workflow.** `.github/workflows/release.yml`: `v*`
-  tag → build `oss` bundle (macOS arm64) → generate `THIRD_PARTY_LICENSES` via
-  `cargo-about` → publish GitHub Release. Unsigned v1 (ADR-009). See `RELEASING.md`.
+- ✅ **DONE — Tag-driven release workflow + first release.**
+  `.github/workflows/release.yml`: `v*` tag → build `oss` bundle (macOS arm64) →
+  generate `THIRD_PARTY_LICENSES` via `cargo-about` → publish GitHub Release. Unsigned
+  v1 (ADR-009). See `RELEASING.md`. **`v0.1.0` shipped + smoke-tested** (downloads,
+  installs via the documented `xattr` step, launches; version reads 0.1.0).
+- **Release preflight gate (guardrail).** `release.yml` and `ci.yml` are independent
+  triggers — a release can be cut from a commit whose CI is red (v0.1.0 was, off a
+  red-fmt commit; harmless that time). Add a fast first job to `release.yml`
+  (`cargo fmt --check` + `cargo check`/`--check-only`) that must pass before the ~1.5h
+  build, so a broken commit fails in ~1 min and can't ship.
+- **macOS compile-check in CI.** `ci.yml` only builds **Linux** today, so mac-only
+  breakage (objc/Metal/`platform/mac`) surfaces only at release time. Add a macOS
+  `./script/bundle --channel oss --nouniversal --check-only` job (cheap `cargo check`
+  with release features) to PR CI. (Costs macOS minutes per push — weigh it.)
+- **Ad-hoc codesign seal warning.** `codesign --verify` on the unsigned bundle prints
+  "code has no resources but signature indicates they must be present" (benign; app
+  still launches via the documented workaround). Goes away when real Developer ID
+  signing is enabled — no action needed until then.
 - **Code signing + notarization.** *Wired but inactive.* The release workflow
   auto-signs+notarizes once the `APPLE_*` repo secrets are configured (needs an Apple
   **Developer ID Application** cert; `APPLE_TEAM_ID` is now env-overridable in
@@ -39,8 +54,9 @@ entails. Newest concerns first. See [`DECISIONS.md`](DECISIONS.md) for rationale
 - **Auto-update:** none today (`autoupdate_config: None`; the updater pointed at
   Warp's server). Decide: manual updates via GitHub Releases, or build a
   GitHub-Releases-based self-updater.
-- **Verify the slim CI** (`.github/workflows/ci.yml`) actually goes green on first
-  push; promote clippy to `-D warnings` after the inert-cfg cleanup below.
+- ✅ **DONE — slim CI green.** `.github/workflows/ci.yml` (rustfmt + Linux build) is
+  green on `main` after the `cargo fmt` import-ordering fix. Still TODO: promote clippy
+  to `-D warnings` after the inert-cfg cleanup below.
 
 ## Deeper source removal (M6 — optional)
 

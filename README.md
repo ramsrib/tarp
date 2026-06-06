@@ -32,9 +32,11 @@ practical, and stripped back. That's the intent here.
 
 ## Status
 
-Early work in progress. The client builds, bundles, and runs as a terminal with
-the AI/cloud/account/editor surfaces disabled. See [`TARP-PLAN.md`](TARP-PLAN.md)
-for the roadmap, [`docs/`](docs/README.md) for the audit and design notes, and
+Early but usable — **`v0.1.0` is the first released build** (macOS, Apple Silicon;
+see [Download](#download)). The client builds, bundles, and runs as a terminal with
+the AI/cloud/account/editor surfaces disabled. Releases are unsigned for now (a
+Gatekeeper step is needed on first launch). See [`TARP-PLAN.md`](TARP-PLAN.md) for
+the roadmap, [`docs/`](docs/README.md) for the audit and design notes, and
 [`docs/PROGRESS.md`](docs/PROGRESS.md) for the work log.
 
 ## Download

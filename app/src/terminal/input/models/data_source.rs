@@ -43,7 +43,7 @@ use crate::terminal::input::message_bar::{Message, MessageItem};
 use crate::workspace::WorkspaceAction;
 use crate::workspaces::user_workspaces::UserWorkspaces;
 
-const AUTO_BEDROCK_TOOLTIP: &str = "Warp uses Bedrock when the model Auto selects supports it; otherwise it may use Warp-hosted inference.";
+const AUTO_BEDROCK_TOOLTIP: &str = "Tarp uses Bedrock when the model Auto selects supports it; otherwise it may use Tarp-hosted inference.";
 
 #[derive(Clone, Debug)]
 pub struct AcceptModel {

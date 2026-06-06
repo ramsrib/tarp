@@ -62,19 +62,19 @@ pub fn sections(ctx: &mut ViewContext<ResourceCenterMainView>) -> Vec<Section> {
         items: vec![
             ContentItem {
                 title: "Use your custom prompt",
-                description: "Set up Warp to honor your PS1 setting",
+                description: "Set up Tarp to honor your PS1 setting",
                 url: "https://docs.warp.dev/terminal/appearance/prompt",
                 button_label: "View documentation",
             },
             ContentItem {
-                title: "Integrate Warp with your IDE",
-                description: "Configure Warp to launch from your most used development tools",
+                title: "Integrate Tarp with your IDE",
+                description: "Configure Tarp to launch from your most used development tools",
                 url: "https://docs.warp.dev/terminal/integrations-and-plugins",
                 button_label: "View documentation",
             },
             ContentItem {
-                title: "How Warp uses Warp",
-                description: "Learn how Warp's engineering team uses their favorite features",
+                title: "How Tarp uses Tarp",
+                description: "Learn how Tarp's engineering team uses their favorite features",
                 url: "https://www.warp.dev/blog/how-warp-uses-warp",
                 button_label: "Read article",
             },

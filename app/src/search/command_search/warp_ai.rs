@@ -133,7 +133,7 @@ impl SearchItem for WarpAISearchItem {
     }
 
     fn accessibility_label(&self) -> String {
-        format!("Warp AI: {}", self.item_body_text())
+        format!("Tarp AI: {}", self.item_body_text())
     }
 }
 

@@ -8,6 +8,22 @@ Companion to [`../TARP-PLAN.md`](../TARP-PLAN.md) (the plan) and
 
 ## 2026-06-05
 
+### Release engineering — tag-driven downloadable build (M4, ADR-009)  🟡 in validation
+- **`.github/workflows/release.yml`** — on a `vX.Y.Z` tag (or manual dispatch) builds
+  the `oss` bundle on a macOS arm64 runner, generates `THIRD_PARTY_LICENSES` via
+  `cargo-about`, packages `Tarp-macos-arm64.dmg`, publishes a GitHub Release.
+  **Unsigned v1**; signing+notarization auto-activate when `APPLE_*` secrets are set.
+- **`script/macos/bundle`** (script-owned): `APPLE_TEAM_ID` env-overridable; unsigned
+  DMG built from a clean staging dir; DMG volname = app name; dropped Warp install
+  background (plain DMG).
+- **`prepare_environment`**: rust-cache `save-if` master→main.
+- **Docs:** `RELEASING.md` (tag flow + signing + unsigned-install workaround), README
+  Download section, BUILD.md release-build section (+ stale `warp-oss`→`tarp` fixes).
+- **Brand fix:** removed the opaque grey backing card + residual halo from the icon
+  master; regenerated all assets; updated GitHub repo description.
+- **Status:** workflow validated via `workflow_dispatch` dry-run; first real release
+  awaits a `v*` tag.
+
 ### Brand assets + logo + handoff  ✅
 - Tarp **app icon** (from `tarp-2` candidate): floodfilled to transparent, re-padded to
   the macOS grid (centered, ~84% art). **README logo** + **GitHub social banner**

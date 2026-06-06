@@ -295,10 +295,11 @@ impl WarpTheme {
         color_fill
     }
 
-    // Although text selection colors aren't yet themed, declaring them in this file
-    // will make it easier to theme text selection colors in the future!
+    // Tarp: theme the text selection from the active theme's accent (was a
+    // hardcoded blue) so it matches the theme — e.g. Rainfly's olive-green —
+    // instead of always being blue regardless of theme.
     pub fn text_selection_color(&self) -> Fill {
-        Fill::Solid(ColorU::new(118, 167, 250, (0.4 * 255.) as u8))
+        self.accent().with_opacity(40)
     }
 
     pub fn text_selection_as_context_color(&self) -> Fill {

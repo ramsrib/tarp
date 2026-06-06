@@ -269,6 +269,15 @@ fn project_dirs_for_app_id(
 /// * [`containerURLForSecurityApplicationGroupIdentifier`](https://developer.apple.com/documentation/foundation/filemanager/containerurl(forsecurityapplicationgroupidentifier:)?language=objc)
 #[cfg(target_os = "macos")]
 pub fn app_group_container_path() -> Option<PathBuf> {
+    // Tarp (OSS channel) ships without an app-group entitlement and must not
+    // touch the upstream Warp app-group container: probing it (the tempfile
+    // write below) trips macOS's "would like to access data from other apps"
+    // privacy prompt on every launch. A plain local terminal has no shared
+    // group container, so skip it entirely and let callers fall back to the
+    // regular state dir.
+    if ChannelState::channel() == Channel::Oss {
+        return None;
+    }
     use std::sync::LazyLock;
     static CONTAINER_PATH: LazyLock<Option<PathBuf>> = LazyLock::new(|| {
         use objc2_foundation::{NSFileManager, NSString};

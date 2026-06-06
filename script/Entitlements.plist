@@ -2,23 +2,17 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+    <!--
+      Tarp is a plain, privacy-first terminal and requests only what a terminal
+      needs. The upstream Warp entitlements (camera, microphone, contacts,
+      calendars, location, photos, and a Warp app-group) were for AI/agent
+      features Tarp removes, so they are intentionally dropped — Tarp should not
+      ask for any of those permissions when signed.
+
+      Kept: apple-events, so the "New <App> Tab/Window Here" Finder services and
+      basic terminal automation keep working.
+    -->
     <key>com.apple.security.automation.apple-events</key>
-	<true/>
-    <key>com.apple.security.device.audio-input</key>
-	<true/>
-	<key>com.apple.security.device.camera</key>
-	<true/>
-    <key>com.apple.security.personal-information.addressbook</key>
-	<true/>
-	<key>com.apple.security.personal-information.calendars</key>
-	<true/>
-	<key>com.apple.security.personal-information.location</key>
-	<true/>
-	<key>com.apple.security.personal-information.photos-library</key>
-	<true/>
-    <key>com.apple.security.application-groups</key>
-    <array>
-    <string>2BBY89MBSN.dev.warp</string>
-    </array>
+    <true/>
 </dict>
 </plist>

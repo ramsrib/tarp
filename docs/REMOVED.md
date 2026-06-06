@@ -80,6 +80,13 @@ interactive testing; see [`PROGRESS.md`](PROGRESS.md) for the narrative.
 | Vim banner | No longer auto-shown on launch (feature kept; enable via settings) | `2bb007b2` |
 | Debug build noise | Per-block memory-stats footer defaulted off; "(nld overridden)" prompt tag dropped | `093f6ba8` |
 | Native menu bar | App menu: About→Tarp, Set-Default→Tarp, title→Tarp; removed Toggle Resource Center, Invite People, Privacy Policy, Log out. Edit "Use Tarp's Prompt". Help: only GitHub Issues (Tarp repo). File: removed New Agent Tab. Tab right-click: removed Share session/Stop sharing | `1a889c4b` |
+| **Telemetry / tracking** | Network egress (`send_batch_messages_to_rudder`) hard no-op — nothing transmitted, ever (privacy-first; on top of OSS `telemetry_config: None` + no analytics/sentry features). | `59479f20` |
+| **Terms of Service link** | Removed the "Warp's ToS" link (no cloud service → no ToS/privacy policy needed). | `59479f20` |
+
+> See also (rebrands/defaults, not removals — in [`PROGRESS.md`](PROGRESS.md) /
+> [`DECISIONS.md`](DECISIONS.md)): full Warp→Tarp visible-string audit (151 files),
+> identity (`dev.tarp.Tarp`, `tarp` bin, `Tarp.app`, `TERM_PROGRAM=TarpTerminal`,
+> XTVERSION `Tarp(ver)`, `tarp.log`, `~/.tarp`), and the "Sync with OS" theme default.
 
 > **Tracked-crate edit (logged for upstream-sync):** `crates/warpui/src/platform/mac/menus.rs` — "Hide Warp"/"Quit Warp" → "Hide Tarp"/"Quit Tarp" (hardcoded app-name in the standard menu items; justified branding). Only this one warpui string edit so far.
 

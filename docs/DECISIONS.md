@@ -106,3 +106,39 @@ ADR-003 / `08-upstream-sync.md`.
   `gh auth switch --user ramsrib` (owner, has it in keyring) → `gh repo edit
   --default-branch main` + `git push origin --delete master` → switched back to
   `sri-vapi`. No lasting change to gh's active account.
+
+## ADR-007 — Privacy-first: no telemetry, no trackers, no ToS/privacy policy
+**Decision (2026-06-05):** Tarp is a plain, local terminal with **zero** telemetry,
+analytics, crash-reporting, or tracking, and **no** Terms of Service or Privacy
+Policy (it offers no cloud service, stores nothing remotely, tracks nothing).
+- Telemetry network egress (`app/src/server/telemetry/mod.rs::send_batch_messages_to_rudder`,
+  the single analytics POST chokepoint) is an **unconditional no-op** — nothing is
+  transmitted regardless of channel config/settings (defense-in-depth on top of the
+  OSS channel's `telemetry_config: None` and no analytics/sentry features compiled in).
+- No crash-reporting/Sentry (features off); no firebase call on launch (anon-user
+  creation only lives in the bypassed login flow).
+- Removed the "Terms of Service" link; Privacy/Shared-blocks settings tabs and the
+  Privacy-Policy menu item already removed.
+**Why:** matches the project's reason to exist; eliminates the takedown/privacy risk
+surface; "just a terminal."
+**Detail:** `PROGRESS.md` (privacy entry).
+
+## ADR-008 — Branding scope: convert user-exposed surfaces only; defer `WARP_*` env vars
+**Decision (2026-06-05):** Rename "Warp"→"Tarp" only where it is **exposed to the
+user**; leave internal code as-is.
+- **Convert:** UI labels/strings, menus, notifications, settings, window title,
+  About, app/bundle identity (`dev.tarp.Tarp`, binary `tarp`, `Tarp.app`),
+  `TERM_PROGRAM=TarpTerminal`, XTVERSION `Tarp(version)`, log file `tarp.log`, config
+  dir `~/.tarp`, `.desktop`, URLs that were Warp's → the Tarp repo.
+- **Keep (not user-visible):** Rust identifiers/types/`const`s, `feature = "..."`
+  flag names, crate names (`warp_core`, `warpui`, …), module/file names,
+  `warpdotdev`/`docs.warp.dev` upstream URLs, telemetry payload strings (backend,
+  and now inert), `warp-oss` artifact names in `autoupdate/*` (must match release
+  artifacts; autoupdate disabled anyway), required Denver copyright.
+- **Deferred:** the `WARP_*` shell-integration env vars **are** exposed (exported into
+  the user's shell, visible via `env`), so they qualify — but renaming to `TARP_*` is
+  a large, tightly-coupled change (~38 names, ~87 Rust read-sites + shell scripts +
+  OSC markers) that risks breaking shell integration, with purely cosmetic benefit.
+  **Deferred to a dedicated, well-tested pass** — see [`BACKLOG.md`](BACKLOG.md).
+**Why:** maximizes branding cleanliness for what users see while avoiding risky,
+zero-functional-value churn in internal plumbing (also keeps upstream-sync easier).

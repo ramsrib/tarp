@@ -24,6 +24,7 @@ has been changed; this is documentation only.
 | [`DECISIONS.md`](DECISIONS.md) | Decision log (ADR-style) — the consequential calls and their rationale. |
 | [`REMOVED.md`](REMOVED.md) | Removed-features registry with restore pointers. |
 | [`PROGRESS.md`](PROGRESS.md) | Chronological work log. |
+| [`BACKLOG.md`](BACKLOG.md) | Deliberately-deferred work (incl. `WARP_*` env-var rename, release/signing, M6 source deletion). |
 
 The actionable, sequenced plan lives in [`../TARP-PLAN.md`](../TARP-PLAN.md).
 This doc set is the **evidence** behind that plan.

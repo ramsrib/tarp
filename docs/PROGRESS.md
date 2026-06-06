@@ -8,6 +8,16 @@ Companion to [`../TARP-PLAN.md`](../TARP-PLAN.md) (the plan) and
 
 ## 2026-06-05
 
+### Privacy-first + defaults + deferred WARP_* (ADR-007/008)  ✅ (`59479f20`, `ec54d3a5`)
+- **Privacy:** telemetry egress hard-disabled (no-op); ToS link removed; confirmed no
+  firebase/network call on launch. No telemetry/trackers/ToS/privacy-policy (ADR-007).
+- **Defaults:** "Sync with OS" theme on by default; config dir `~/.warp-oss`→`~/.tarp`;
+  log `tarp.log`.
+- **`WARP_*` env vars:** confirmed user-exposed; rename to `TARP_*` **deferred** (large,
+  risky, cosmetic) — tracked in [`BACKLOG.md`](BACKLOG.md), rationale in ADR-008.
+- Docs caught up: ADR-007 (privacy), ADR-008 (branding scope), BACKLOG.md created,
+  REMOVED.md + README index updated.
+
 ### Full Warp→Tarp visible-string audit + identity  ✅ (merged `e4404b03`, `60795c71`)
 - **Visible-label sweep (agent):** 151 files, ~466 user-visible "Warp" strings →
   "Tarp" across window titles, settings UI (incl. Input-type radio), menus,

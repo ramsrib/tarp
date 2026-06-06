@@ -328,7 +328,7 @@ impl AuthViewBody {
             Flex::row()
                 .with_child(
                     ui_builder
-                        .span("By continuing, you agree to Warp's ")
+                        .span("By continuing, you agree to Tarp's ")
                         .with_style(disclaimer_styles)
                         .build()
                         .finish(),

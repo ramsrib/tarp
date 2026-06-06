@@ -8,6 +8,28 @@ Companion to [`../TARP-PLAN.md`](../TARP-PLAN.md) (the plan) and
 
 ## 2026-06-05
 
+### v0.1.0 shipped — first public release  🎉
+- **Released:** [`v0.1.0`](https://github.com/ramsrib/tarp/releases/tag/v0.1.0) (public,
+  not draft) with `Tarp-macos-arm64.dmg` (154 MB) + `THIRD_PARTY_LICENSES.txt` (1.3 MB).
+- **Build:** 1h19m on `macos-latest` (vs 1h35m cold dry-run — the macOS rust-cache saved
+  on `main` restored cross-ref, so warm cache shaved ~16m; deps cached, workspace+LTO
+  recompiled). In-app version auto-derived from the tag → reads **0.1.0**.
+- **Smoke test (PASS):** downloaded the published DMG → mounts cleanly (drag-to-install
+  layout) → identity `dev.tarp.Tarp` / name `Tarp` → simulated browser quarantine →
+  `xattr -dr com.apple.quarantine` → **app launches**. Ad-hoc/unsigned as expected
+  (`spctl` rejects; documented workaround bypasses it). `codesign --verify` prints a
+  benign resources-seal warning on the ad-hoc bundle — resolved once real Developer ID
+  signing is added.
+- **CI fix:** the slim `ci.yml` `rustfmt` job had been red on every `main` push from
+  pre-existing import-ordering drift (`about_page.rs`, `universal_developer_input.rs`);
+  fixed with `cargo fmt` — CI green now.
+- **Guardrail gap found:** `release.yml` and `ci.yml` are independent triggers, so a
+  release can be (and was — v0.1.0 off a red-fmt commit, harmless since fmt has no
+  binary effect) cut from a commit whose CI is failing. Added a backlog item for a
+  release **preflight gate** (fmt + check before the expensive build) and a **macOS
+  compile-check in CI** (today CI only builds Linux; mac-only breakage would surface
+  only at release time). See [`BACKLOG.md`](BACKLOG.md).
+
 ### Release engineering — tag-driven downloadable build (M4, ADR-009)  ✅ validated
 - **`.github/workflows/release.yml`** — on a `vX.Y.Z` tag (or manual dispatch) builds
   the `oss` bundle on a macOS arm64 runner, generates `THIRD_PARTY_LICENSES` via

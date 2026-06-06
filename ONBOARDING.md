@@ -21,6 +21,9 @@ no telemetry**.
 | [`TARP-PLAN.md`](TARP-PLAN.md) | Milestones (M0–M6). |
 
 ## Current state (what's done)
+- **Shipped `v0.1.0`** — first public release (macOS arm64, unsigned): tag-driven
+  `release.yml` builds the OSS DMG + `THIRD_PARTY_LICENSES` and publishes a GitHub
+  Release. Smoke-tested end-to-end. Slim `ci.yml` (rustfmt + Linux build) is green.
 - **Builds, bundles, launches** as `Tarp.app` (OSS channel). Identity is fully Tarp:
   `dev.tarp.Tarp`, binary `tarp`, `Tarp.app`, `TERM_PROGRAM=TarpTerminal`,
   config `~/.tarp`, log `tarp.log`, custom icon.
@@ -75,9 +78,11 @@ WARP_SKIP_COMMON_SKILLS_INSTALL=1 ./script/run --dont-open   # build + bundle Ta
   `app/channels/oss/icon/AppIcon-source.png` and run `script/gen_brand_assets.sh`.
 
 ## What's next (see `docs/BACKLOG.md`)
-1. **Release engineering (M4):** tag-driven release workflow, packaging, **code
-   signing + notarization** (currently ad-hoc signed → Gatekeeper rejects downloads),
-   bundled `THIRD_PARTY_LICENSES`, auto-update decision (none today).
+1. **Release hardening (M4 follow-ups):** a **preflight gate** on `release.yml` (fmt
+   + check before the 1.5h build, so red commits can't ship) and a **macOS
+   compile-check in CI** (CI builds Linux only today). Then **code signing +
+   notarization** (wired but inactive — add `APPLE_*` secrets) and expand the matrix
+   (Intel/universal, Linux, Windows). Auto-update: none today.
 2. **`WARP_*` → `TARP_*`** env-var rename (exposed but deferred — large/risky; do as
    an isolated pass with a shell-integration test).
 3. Logo/wordmark polish; retire `WARP.md`/`FAQ.md`.

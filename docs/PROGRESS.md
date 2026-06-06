@@ -8,6 +8,17 @@ Companion to [`../TARP-PLAN.md`](../TARP-PLAN.md) (the plan) and
 
 ## 2026-06-05
 
+### Brand assets + logo + handoff  ✅
+- Tarp **app icon** (from `tarp-2` candidate): floodfilled to transparent, re-padded to
+  the macOS grid (centered, ~84% art). **README logo** + **GitHub social banner**
+  (1280×640, "A plain, modern terminal · No AI · No cloud · No tracking") added.
+- **`script/gen_brand_assets.sh`** — regenerates app icon + About/README logos +
+  social banner from one source (`app/channels/oss/icon/AppIcon-source.png`). Tweak
+  source → re-run → `./script/run` to re-bundle.
+- Social preview = manual upload (GitHub Settings → Social preview).
+- Handoff guide written: `ONBOARDING.md` (repo root).
+
+
 ### Privacy-first + defaults + deferred WARP_* (ADR-007/008)  ✅ (`59479f20`, `ec54d3a5`)
 - **Privacy:** telemetry egress hard-disabled (no-op); ToS link removed; confirmed no
   firebase/network call on launch. No telemetry/trackers/ToS/privacy-policy (ADR-007).

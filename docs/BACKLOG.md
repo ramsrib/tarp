@@ -30,11 +30,10 @@ entails. Newest concerns first. See [`DECISIONS.md`](DECISIONS.md) for rationale
   generate `THIRD_PARTY_LICENSES` via `cargo-about` → publish GitHub Release. Unsigned
   v1 (ADR-009). See `RELEASING.md`. **`v0.1.0` shipped + smoke-tested** (downloads,
   installs via the documented `xattr` step, launches; version reads 0.1.0).
-- **Release preflight gate (guardrail).** `release.yml` and `ci.yml` are independent
-  triggers — a release can be cut from a commit whose CI is red (v0.1.0 was, off a
-  red-fmt commit; harmless that time). Add a fast first job to `release.yml`
-  (`cargo fmt --check` + `cargo check`/`--check-only`) that must pass before the ~1.5h
-  build, so a broken commit fails in ~1 min and can't ship.
+- ✅ **DONE — Release preflight gate.** `release.yml` now has a fast Linux job
+  (`cargo fmt --check` + `cargo check --features gui`) gating the macOS build, so a
+  release can't be cut from an unformatted/non-compiling commit. CI Linux + preflight
+  share a `linux` rust-cache key (`cache-all-crates` on all caches).
 - **macOS compile-check in CI.** `ci.yml` only builds **Linux** today, so mac-only
   breakage (objc/Metal/`platform/mac`) surfaces only at release time. Add a macOS
   `./script/bundle --channel oss --nouniversal --check-only` job (cheap `cargo check`

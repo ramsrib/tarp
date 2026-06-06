@@ -35,7 +35,7 @@ static INSTALL_INSTRUCTIONS: LazyLock<PluginInstructions> = LazyLock::new(|| {
     PluginInstructions {
         title: "Install Tarp Plugin for OpenCode",
         subtitle:
-            "Add the Warp plugin to your OpenCode configuration, then restart OpenCode.",
+            "Add the Tarp plugin to your OpenCode configuration, then restart OpenCode.",
         steps: &[
             PluginInstructionStep {
                 description: "Open or create your opencode.json. This can be in your project root, or the global config path:",

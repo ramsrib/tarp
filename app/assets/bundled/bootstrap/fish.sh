@@ -612,7 +612,7 @@ if test "$WARP_IS_LOCAL_SHELL_SESSION" = "1"
         command ssh -o ControlMaster=yes -o ControlPath=$SSH_SOCKET_DIR/$WARP_SESSION_ID \
         -t $argv \
 "
-export TERM_PROGRAM='WarpTerminal'
+export TERM_PROGRAM='TarpTerminal'
 test -n '$WARP_CLIENT_VERSION' && export WARP_CLIENT_VERSION='$WARP_CLIENT_VERSION'
 # Only forward the protocol version if it was set locally (i.e. the HOANotifications feature flag is on).
 test -n '$WARP_CLI_AGENT_PROTOCOL_VERSION' && export WARP_CLI_AGENT_PROTOCOL_VERSION='$WARP_CLI_AGENT_PROTOCOL_VERSION'

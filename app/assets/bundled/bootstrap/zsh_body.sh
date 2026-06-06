@@ -881,7 +881,7 @@ if [[ -z $WARP_BOOTSTRAPPED ]]; then
           command ssh -o ControlMaster=yes -o ControlPath=$SSH_SOCKET_DIR/$WARP_SESSION_ID \
           -t "${@:1}" \
 "
-export TERM_PROGRAM='WarpTerminal'
+export TERM_PROGRAM='TarpTerminal'
 # Mark the remote side of a Warp-managed SSH session so the bootstrap
 # body can distinguish it from local shells. Used to gate the ExitShell
 # hook which tears down the remote-server-proxy subprocess.

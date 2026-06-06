@@ -45,22 +45,18 @@ Grab the latest `Tarp-macos-arm64.dmg` from the
 [Releases](https://github.com/ramsrib/tarp/releases) page (macOS, Apple Silicon),
 open it, and drag **Tarp** to Applications.
 
-Builds are currently **unsigned**, so on first launch macOS Gatekeeper blocks the
-app — on Apple Silicon it typically says **"Tarp is damaged and can't be opened."**
-That message is expected for an unsigned download (it's not actually damaged).
-Clear the download quarantine once, from Terminal:
+Builds are currently **unsigned**, so on first launch macOS blocks the app with
+*"Apple could not verify "Tarp" is free of malware…"* (expected for an unsigned
+download — it's fine). Open it once, either way:
 
-```sh
-xattr -dr com.apple.quarantine /Applications/Tarp.app
-```
+- **No Terminal:** click **Done**, then **System Settings → Privacy & Security**,
+  scroll to the bottom and click **Open Anyway** next to Tarp, then confirm. **or**
+- **Terminal:** `xattr -dr com.apple.quarantine /Applications/Tarp.app`, then open Tarp.
 
-Then open Tarp normally. (Note: the usual *right-click → Open* trick is for the
-"unidentified developer" warning and generally does **not** clear "damaged" — use
-the command above.)
-
-Signing/notarization (so downloads open with no workaround) is a planned
-follow-up — see [`RELEASING.md`](RELEASING.md). Intel/universal, Linux, and
-Windows builds are not published yet; build from source for those.
+After that it opens normally. Signing/notarization (so downloads open with no
+prompt at all) is a planned follow-up — see [`RELEASING.md`](RELEASING.md).
+Intel/universal, Linux, and Windows builds are not published yet; build from
+source for those.
 
 ## Building from source
 

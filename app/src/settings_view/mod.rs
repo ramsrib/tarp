@@ -285,8 +285,8 @@ impl Display for SettingsSection {
             SettingsSection::Keybindings => write!(f, "Keyboard shortcuts"),
             SettingsSection::SharedBlocks => write!(f, "Shared blocks"),
             SettingsSection::MCPServers => write!(f, "MCP Servers"),
-            SettingsSection::WarpDrive => write!(f, "Warp Drive"),
-            SettingsSection::WarpAgent => write!(f, "Warp Agent"),
+            SettingsSection::WarpDrive => write!(f, "Tarp Drive"),
+            SettingsSection::WarpAgent => write!(f, "Tarp Agent"),
             SettingsSection::AgentProfiles => write!(f, "Profiles"),
             SettingsSection::AgentMCPServers => write!(f, "MCP servers"),
             SettingsSection::Knowledge => write!(f, "Knowledge"),
@@ -295,6 +295,7 @@ impl Display for SettingsSection {
             SettingsSection::EditorAndCodeReview => write!(f, "Editor and Code Review"),
             SettingsSection::CloudEnvironments => write!(f, "Environments"),
             SettingsSection::OzCloudAPIKeys => write!(f, "Oz Cloud API Keys"),
+            SettingsSection::Warpify => write!(f, "Tarpify"),
             _ => write!(f, "{self:?}"),
         }
     }
@@ -384,10 +385,10 @@ impl FromStr for SettingsSection {
             "Referrals" => Ok(Self::Referrals),
             "Shared blocks" => Ok(Self::SharedBlocks),
             "Teams" => Ok(Self::Teams),
-            "Warpify" => Ok(Self::Warpify),
-            "WarpDrive" | "Warp Drive" => Ok(Self::WarpDrive),
+            "Warpify" | "Tarpify" => Ok(Self::Warpify),
+            "WarpDrive" | "Warp Drive" | "Tarp Drive" => Ok(Self::WarpDrive),
             // This page was called "Oz" at one point, keep for backward compatibility.
-            "Oz" | "Warp Agent" => Ok(Self::WarpAgent),
+            "Oz" | "Warp Agent" | "Tarp Agent" => Ok(Self::WarpAgent),
             "Profiles" | "AgentProfiles" => Ok(Self::AgentProfiles),
             "MCP servers" | "AgentMCPServers" => Ok(Self::AgentMCPServers),
             "Knowledge" => Ok(Self::Knowledge),

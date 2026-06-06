@@ -58,26 +58,31 @@ magick "$SOURCE" -background "$ICON_BG" -alpha remove -alpha off -resize 1024x10
 magick "$FULLBLEED" -resize 512x512 "$APP_ICON_PNG"
 magick "$FULLBLEED" -define icon:auto-resize=256,128,64,48,32,16 "$APP_ICON_ICO"
 
-# 2) Logo for the About page + README — PADDED + transparent (floats as a rounded
-# icon rather than filling the frame edge-to-edge). The source art nearly fills its
-# canvas, so without padding the dark icon body reads as a hard-edged box on the
-# About panel. Center the art at ~84% with a transparent margin.
-echo "→ about logo:  $ABOUT_LOGO (256, padded)"
-magick "$SOURCE" -resize 216x216 -filter Lanczos -background none -gravity center -extent 256x256 "$ABOUT_LOGO"
-echo "→ readme logo: $README_LOGO (200, padded)"
-magick "$SOURCE" -resize 168x168 -filter Lanczos -background none -gravity center -extent 200x200 "$README_LOGO"
+# 2) Logo for the About page + README — FULL-BLEED + squircle-masked. The About
+# page/README render the logo raw (no OS masking), so a padded transparent icon
+# exposes the device's metallic bezel floating on a flat panel. Filling the tile
+# and baking in the macOS-style rounded-rect (so the bezel sits at the rounded edge
+# and blends) mirrors how the Dock dresses the icon.
+ROUNDED="$(mktemp -t tarp_logo_rounded).png"
+magick "$FULLBLEED" \
+  \( -size 1024x1024 xc:none -fill white -draw "roundrectangle 0,0,1023,1023,230,230" \) \
+  -alpha off -compose CopyOpacity -composite "$ROUNDED"
+echo "→ about logo:  $ABOUT_LOGO (256, full-bleed rounded)"
+magick "$ROUNDED" -resize 256x256 -filter Lanczos "$ABOUT_LOGO"
+echo "→ readme logo: $README_LOGO (200, full-bleed rounded)"
+magick "$ROUNDED" -resize 200x200 -filter Lanczos "$README_LOGO"
 
 # 3) GitHub social-preview banner (1280x640): logo left, title + tagline + pillars.
 echo "→ social banner: $SOCIAL_BANNER (1280x640)"
 magick -size 1280x640 "xc:$BG" \
-  \( "$SOURCE" -resize 340x340 \) -gravity West -geometry +150+0 -composite \
+  \( "$ROUNDED" -resize 340x340 \) -gravity West -geometry +150+0 -composite \
   -gravity West \
   -font "$TITLE_FONT" -fill '#ffffff'        -pointsize 150 -annotate +560-40 "$TITLE" \
   -font "$BODY_FONT"  -fill "$TAGLINE_COLOR"  -pointsize 48  -annotate +566+62 "$TAGLINE" \
   -font "$BODY_FONT"  -fill "$ACCENT_COLOR"   -pointsize 32  -annotate +568+128 "$PILLARS" \
   "$SOCIAL_BANNER"
 
-rm -f "$FULLBLEED"
+rm -f "$FULLBLEED" "$ROUNDED"
 echo
 echo "Done. Regenerated brand assets from $SOURCE."
 echo "Next: re-bundle the app so the new .icns is baked in:  ./script/run --dont-open"

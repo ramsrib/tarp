@@ -37,6 +37,13 @@ jobs:
       - name: Install pinned Rust toolchain
         run: rustup show
       - uses: Swatinem/rust-cache@v2
+        with:
+          # Shared per-OS key so the release preflight (also Linux) reuses this
+          # cache. Save only on main so PRs don't churn it; cache deps broadly so
+          # it survives feature/lockfile tweaks.
+          shared-key: linux
+          cache-all-crates: "true"
+          save-if: ${{ github.ref == 'refs/heads/main' }}
       - name: Build the terminal (OSS, no AI/cloud features)
         run: cargo build --bin tarp --features gui
       # clippy runs informationally for now: the tree still carries inert

@@ -26,7 +26,8 @@ define_settings_group!(ThemeSettings, settings: [
     },
     use_system_theme: UseSystemTheme {
         type: bool,
-        default: false,
+        // Tarp: follow the OS light/dark theme by default ("Sync with OS" on).
+        default: true,
         supported_platforms: SupportedPlatforms::ALL,
         sync_to_cloud: SyncToCloud::Globally(RespectUserSyncSetting::Yes),
         private: false,

@@ -698,6 +698,22 @@ elif [[ $CODESIGN = true ]]; then
     # https://developer.apple.com/documentation/security/customizing-the-notarization-workflow?language=objc#Staple-the-ticket-to-your-distribution
     STAPLE_TICKET=false
   fi
+else
+  # Unsigned build (--nosign): the build + bundle modifications (rpath, plist
+  # edits, dock-tile plugin, CLI wrapper) leave the linker's ad-hoc signature
+  # inconsistent ("code has no resources but signature indicates they must be
+  # present"), which Gatekeeper reports as "Tarp is damaged" on a quarantined
+  # download. Do a clean ad-hoc deep re-sign so the seal is valid; a quarantined
+  # download then shows the milder, user-bypassable "unidentified developer"
+  # prompt instead. (No hardened runtime: ad-hoc has no team identity, so library
+  # validation would block loading the bundled frameworks.)
+  if [[ "$ARTIFACT" == app ]]; then
+    echo "Ad-hoc signing (valid seal; not a Developer ID) $BUNDLE_DIR/$WARP_APP_NAME.app..."
+    codesign --force --deep --sign - "$BUNDLE_DIR/$WARP_APP_NAME.app"
+  elif [[ "$ARTIFACT" == cli ]]; then
+    echo "Ad-hoc signing $OUT_DIR/$WARP_BIN..."
+    codesign --force --sign - "$OUT_DIR/$WARP_BIN"
+  fi
 fi
 
 ########################

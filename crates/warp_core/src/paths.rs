@@ -26,7 +26,7 @@ use crate::AppId;
 ///
 /// This should be used, for example, as the base directory under which
 /// repository workflows would be stored (in "./.warp/workflows").
-pub const WARP_CONFIG_DIR: &str = ".warp";
+pub const WARP_CONFIG_DIR: &str = ".tarp";
 
 /// The name of the folder that stores Warp execution logs and network logs.
 /// This is currently only used on Windows to maintain backwards compatibility.
@@ -37,7 +37,8 @@ fn base_warp_config_dir_name() -> String {
         // Preview shares the same directory as Stable for backward
         // compatibility — existing users already have config in `.warp`.
         Channel::Stable | Channel::Preview => WARP_CONFIG_DIR.to_owned(),
-        Channel::Oss => format!("{WARP_CONFIG_DIR}-oss"),
+        // Tarp: the OSS channel is the Tarp build — use a clean `~/.tarp` (no -oss suffix).
+        Channel::Oss => WARP_CONFIG_DIR.to_owned(),
         Channel::Dev => format!("{WARP_CONFIG_DIR}-dev"),
         Channel::Integration => format!("{WARP_CONFIG_DIR}-integration"),
         Channel::Local => format!("{WARP_CONFIG_DIR}-local"),
@@ -86,7 +87,8 @@ fn macos_config_dir_name() -> String {
     match ChannelState::channel() {
         Channel::Stable => WARP_CONFIG_DIR.to_owned(),
         Channel::Preview => format!("{WARP_CONFIG_DIR}-preview"),
-        Channel::Oss => format!("{WARP_CONFIG_DIR}-oss"),
+        // Tarp: clean `.tarp` for the OSS (Tarp) build.
+        Channel::Oss => WARP_CONFIG_DIR.to_owned(),
         Channel::Dev => format!("{WARP_CONFIG_DIR}-dev"),
         Channel::Integration => format!("{WARP_CONFIG_DIR}-integration"),
         Channel::Local => format!("{WARP_CONFIG_DIR}-local"),

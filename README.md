@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/assets/tarp-logo.png" alt="Tarp logo" width="160" height="160" />
+</p>
+
 <h1 align="center">Tarp</h1>
 
 <p align="center">

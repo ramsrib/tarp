@@ -1,7 +1,7 @@
 [package]
 authors = ["The Tarp Authors", "Warp Team <dev@warp.dev>"]
 default-run = "tarp"
-description = "Tarp — a plain, fast terminal"
+description = "Tarp — a plain, modern terminal"
 edition = "2021"
 autobins = false
 name = "warp"
@@ -879,7 +879,7 @@ identifier = "dev.tarp.Tarp"
 name = "Tarp"
 resources = ["assets/onboarding"]
 icon = ["channels/oss/icon/no-padding/512x512.png", "channels/oss/icon/no-padding/icon.ico"]
-short_description = "Tarp — a plain, fast terminal (a fork of Warp with AI, cloud, and accounts removed)."
+short_description = "Tarp — a plain, modern terminal (a fork of Warp with AI, cloud, and accounts removed)."
 
 [package.metadata.bundle.bin.stable]
 category = "public.app-category.developer-tools"

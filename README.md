@@ -37,6 +37,22 @@ the AI/cloud/account/editor surfaces disabled. See [`TARP-PLAN.md`](TARP-PLAN.md
 for the roadmap, [`docs/`](docs/README.md) for the audit and design notes, and
 [`docs/PROGRESS.md`](docs/PROGRESS.md) for the work log.
 
+## Download
+
+Grab the latest `Tarp-macos-arm64.dmg` from the
+[Releases](https://github.com/ramsrib/tarp/releases) page (macOS, Apple Silicon),
+open it, and drag **Tarp** to Applications.
+
+Builds are currently **unsigned**, so macOS Gatekeeper warns on first launch. One
+time only, either:
+
+- **right-click the app → Open** and confirm the dialog, or
+- clear the quarantine flag: `xattr -dr com.apple.quarantine /Applications/Tarp.app`
+
+After that it opens normally. (Signing/notarization is a planned follow-up — see
+[`RELEASING.md`](RELEASING.md). Intel/universal, Linux, and Windows builds are not
+published yet; build from source for those.)
+
 ## Building from source
 
 Tarp builds with the standard Rust toolchain plus a couple of platform

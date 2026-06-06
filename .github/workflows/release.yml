@@ -1,0 +1,127 @@
+name: Release
+
+# Tag-driven release for Tarp. Pushing a semver tag (vX.Y.Z) builds the OSS
+# bundle and publishes a GitHub Release with the artifacts attached. You can
+# also dry-run the build from the Actions tab via workflow_dispatch (no Release
+# is created unless you opt in).
+#
+# v1 ships UNSIGNED (see docs): macOS Gatekeeper will warn on first launch;
+# install docs cover the right-click->Open / xattr workaround. Signing +
+# notarization auto-activate when the Apple secrets below are configured in the
+# repo — no workflow edits needed:
+#   APPLE_DEVELOPER_ID_CERT           base64 of the Developer ID Application .p12
+#   APPLE_DEVELOPER_ID_CERT_PASSWORD  password for that .p12
+#   APPLE_NOTARIZATION_APPLE_ID       Apple ID email used for notarytool
+#   APPLE_NOTARIZATION_PASSWORD       app-specific password for that Apple ID
+#   APPLE_TEAM_ID                     10-char Apple Developer Team ID
+#   APPLE_CODESIGN_KEYCHAIN_PASSWORD  arbitrary; scoped to the CI keychain
+#
+# See docs/RELEASING.md for the full flow.
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to (re)build, e.g. v0.1.0 (used as the Release tag when publish=true)'
+        required: false
+      publish:
+        description: 'Publish a GitHub Release (otherwise build-only dry run)'
+        type: boolean
+        default: false
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write   # create the GitHub Release + upload assets
+
+jobs:
+  build-macos:
+    name: Build macOS (arm64)
+    runs-on: macos-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
+
+      - uses: ./.github/actions/prepare_environment
+        with:
+          target_os: macos
+          is_self_hosted: 'false'
+          install_release_deps: 'true'   # installs cargo-about -> THIRD_PARTY_LICENSES.txt
+
+      - name: Install create-dmg
+        run: brew install create-dmg
+
+      - name: Determine signing mode
+        id: sign
+        env:
+          CERT: ${{ secrets.APPLE_DEVELOPER_ID_CERT }}
+        run: |
+          if [ -n "$CERT" ]; then
+            echo "mode=signed" >> "$GITHUB_OUTPUT"
+            echo "Signing secrets present -> building a signed + notarized bundle."
+          else
+            echo "mode=unsigned" >> "$GITHUB_OUTPUT"
+            echo "No signing secrets -> building an unsigned bundle (v1 default)."
+          fi
+
+      # arm64-only (--nouniversal) for v1: the runner is Apple Silicon and that
+      # is Tarp's target platform. A universal2 build is a later enhancement.
+      - name: Bundle OSS (unsigned)
+        if: steps.sign.outputs.mode == 'unsigned'
+        run: ./script/bundle --channel oss --nouniversal --nosign
+
+      - name: Bundle OSS (signed + notarized)
+        if: steps.sign.outputs.mode == 'signed'
+        env:
+          WARP_DEVELOPER_ID_CERT: ${{ secrets.APPLE_DEVELOPER_ID_CERT }}
+          WARP_DEVELOPER_ID_CERT_PASSWORD: ${{ secrets.APPLE_DEVELOPER_ID_CERT_PASSWORD }}
+          WARP_NOTARIZATION_APPLE_ID: ${{ secrets.APPLE_NOTARIZATION_APPLE_ID }}
+          WARP_NOTARIZATION_PASSWORD: ${{ secrets.APPLE_NOTARIZATION_PASSWORD }}
+          WARP_CODESIGN_KEYCHAIN_PASSWORD: ${{ secrets.APPLE_CODESIGN_KEYCHAIN_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: ./script/bundle --channel oss --nouniversal --read-passwords-from-env
+
+      - name: Stage release artifacts
+        id: stage
+        run: |
+          set -euo pipefail
+          OUT="target/release-lto/bundle/osx"
+          mkdir -p dist
+          cp "$OUT/Tarp.dmg" "dist/Tarp-macos-arm64.dmg"
+          # Third-party attribution generated during bundling.
+          LIC="$OUT/Tarp.app/Contents/Resources/THIRD_PARTY_LICENSES.txt"
+          if [ -f "$LIC" ]; then cp "$LIC" "dist/THIRD_PARTY_LICENSES.txt"; fi
+          echo "Staged:"; ls -la dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tarp-macos-arm64
+          path: dist/**
+          if-no-files-found: error
+
+  release:
+    name: Publish GitHub Release
+    needs: build-macos
+    runs-on: ubuntu-latest
+    # Publish on a tag push, or on a manual dispatch with publish=true.
+    if: ${{ github.event_name == 'push' || github.event.inputs.publish == 'true' }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: List artifacts
+        run: ls -la dist
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.inputs.tag || github.ref_name }}
+          name: ${{ github.event.inputs.tag || github.ref_name }}
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          files: dist/**

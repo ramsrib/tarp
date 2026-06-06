@@ -70,7 +70,7 @@ cleanup_dmg_files() {
         find "$target_dir" -name "rw.*.dmg" -type f -delete
     fi
     # Also check if any volumes are mounted and unmount them
-    hdiutil info | grep "/Volumes/Warp.*" | awk '{print $1}' | while read -r disk; do
+    hdiutil info | grep -E "/Volumes/(Tarp|Warp).*" | awk '{print $1}' | while read -r disk; do
         echo "Unmounting disk image: $disk"
         hdiutil detach "$disk" -force || true
     done
@@ -617,8 +617,10 @@ if [[ $READ_PASSWORDS_FROM_ENV != true ]]; then
 fi
 
 if [[ $CODESIGN = true ]]; then
-  # TODO - does this need to change per user?  Seems like it's tied to the WARP_NOTARIZATION_PASSWORD password.
-  APPLE_TEAM_ID="2BBY89MBSN"
+  # Apple Developer Team ID. Overridable via the APPLE_TEAM_ID env var so a fork
+  # can sign with its own Developer ID without editing this script (the release
+  # workflow passes it from a secret). Falls back to the upstream value.
+  APPLE_TEAM_ID="${APPLE_TEAM_ID:-2BBY89MBSN}"
   CODESIGN_KEYCHAIN_NAME="warp-codesign-keychain"
 
   echo "Starting codesigning..."
@@ -709,10 +711,11 @@ if [[ "$ARTIFACT" = app ]]; then
     local source_folder="$1"
 
     local args=(
-      --volname Warp
+      --volname "$WARP_APP_NAME"
       # For --no-internet-enable, see https://github.com/create-dmg/create-dmg/issues/179
       --no-internet-enable
-      --background app/assets/resources/mac/warp_install_image.png
+      # Tarp ships a plain DMG (no custom background) so the installer carries no
+      # upstream Warp install artwork. (Dropped --background warp_install_image.png.)
       --icon-size 128
       --window-size 700 500
       --format UDZO
@@ -756,13 +759,18 @@ if [[ "$ARTIFACT" = app ]]; then
     NOTARIZATION_ARTIFACT="$DMG_DIR/$DMG_NAME"
     STAPLE_TICKET=true
   else
+    # Stage a clean directory containing only the .app so the (unsigned) DMG
+    # doesn't pick up sibling build artifacts (dSYM, the dmg/ staging dir, etc).
+    # Mirrors the codesign path above, minus signing.
+    if test -d "$DMG_DIR"; then
+      echo "Clearing old dmg directory $DMG_DIR"
+      rm -r "$DMG_DIR"
+    fi
     echo "Creating $DMG_DIR"
     mkdir -p "$DMG_DIR"
+    cp -R "$BUNDLE_DIR/$WARP_APP_NAME.app" "$DMG_DIR"
 
-    echo "Cleaning up any existing DMG files before creating new ones..."
-    cleanup_dmg_files "$DMG_DIR"
-
-    create_warp_dmg "$BUNDLE_DIR"
+    create_warp_dmg "$DMG_DIR"
   fi
 fi
 

@@ -113,9 +113,9 @@ impl WarpifySuccessBlock {
         let auto_warpify_snippet = auto_warpify_snippet.map(|(output_grid, can_write_to_rc)| {
             AutoWarpifySnippet {
                 description: (if !output_grid.is_empty() {
-                    "Run the following to automatically Warpify in the future:"
+                    "Run the following to automatically Tarpify in the future:"
                 } else {
-                    "In remote subshells, Warp runs commands in the background to power completions, syntax highlighting, and other features."
+                    "In remote subshells, Tarp runs commands in the background to power completions, syntax highlighting, and other features."
                 }).into(),
                 output_grid: output_grid.into(),
                 selection_handle: Default::default(),

@@ -37,13 +37,13 @@ pub fn sections(ctx: &mut ViewContext<ResourceCenterMainView>) -> Vec<Section> {
             ),
             FeatureItem::new(
                 "Open command palette",
-                "Access all of Warp via the keyboard.",
+                "Access all of Tarp via the keyboard.",
                 Tip::Action(TipAction::CommandPalette),
                 ctx,
             ),
             FeatureItem::new(
                 "Set your theme",
-                "Make Warp your own by choosing a theme.",
+                "Make Tarp your own by choosing a theme.",
                 Tip::Action(TipAction::ThemePicker),
                 ctx,
             ),

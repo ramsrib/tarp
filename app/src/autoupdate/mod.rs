@@ -736,7 +736,7 @@ pub fn accessibility_content(
         // Found autoupdate
         (RequestType::ManualCheck, Ok(UpdateReady::Yes { .. })) => Some(AccessibilityContent::new(
             "Update available.",
-            "Use the command palette to install and relaunch Warp",
+            "Use the command palette to install and relaunch Tarp",
             WarpA11yRole::HelpRole,
         )),
         // Any non-successful autoupdate check

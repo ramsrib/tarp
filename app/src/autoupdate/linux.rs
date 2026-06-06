@@ -205,10 +205,10 @@ mod package_manager {
                     ))],
                 }),
                 FormattedTextLine::Line(vec![
-                    FormattedTextFragment::plain_text("If you installed Warp using "),
+                    FormattedTextFragment::plain_text("If you installed Tarp using "),
                     FormattedTextFragment::bold(package_manager_name),
                     FormattedTextFragment::plain_text(
-                        " or a compatible tool, the pre-filled command will update Warp for you.",
+                        " or a compatible tool, the pre-filled command will update Tarp for you.",
                     ),
                 ]),
             ];
@@ -216,7 +216,7 @@ mod package_manager {
             if self.package_manager.needs_repository_configuration() {
                 lines.push(FormattedTextLine::Line(vec![
                     FormattedTextFragment::plain_text(
-                        "\nThe command below includes a one-time configuration of the Warp package repository and PGP signing key.",
+                        "\nThe command below includes a one-time configuration of the Tarp package repository and PGP signing key.",
                     ),
                 ]));
             }
@@ -231,7 +231,7 @@ mod package_manager {
                     ),
                     FormattedTextFragment::inline_code("warp_handle_dist_upgrade"),
                     FormattedTextFragment::plain_text(
-                        " function ensures the Warp package repository is enabled, as we've detected you recently upgraded your distribution.",
+                        " function ensures the Tarp package repository is enabled, as we've detected you recently upgraded your distribution.",
                     ),
                 ]));
             }
@@ -239,7 +239,7 @@ mod package_manager {
             lines.push(FormattedTextLine::Line(vec![
                 FormattedTextFragment::plain_text("\nReview the command below, then "),
                 FormattedTextFragment::bold("press enter"),
-                FormattedTextFragment::plain_text(" to install the update and re-launch Warp.  "),
+                FormattedTextFragment::plain_text(" to install the update and re-launch Tarp.  "),
                 FormattedTextFragment::hyperlink(
                     "Please report any issues",
                     "https://github.com/warpdotdev/Warp/issues/new/choose",

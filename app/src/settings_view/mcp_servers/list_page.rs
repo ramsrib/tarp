@@ -1286,7 +1286,7 @@ impl MCPServersListPageView {
                     ));
                 } else if !filtered_gallery_cards.is_empty() {
                     page.add_child(self.render_server_cards_section(
-                        "Shared from Warp",
+                        "Shared from Tarp",
                         &filtered_gallery_cards,
                         appearance,
                         app,

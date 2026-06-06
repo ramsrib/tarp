@@ -58,11 +58,14 @@ magick "$SOURCE" -background "$ICON_BG" -alpha remove -alpha off -resize 1024x10
 magick "$FULLBLEED" -resize 512x512 "$APP_ICON_PNG"
 magick "$FULLBLEED" -define icon:auto-resize=256,128,64,48,32,16 "$APP_ICON_ICO"
 
-# 2) Full-bleed logo for the About page + README.
-echo "→ about logo:  $ABOUT_LOGO (256)"
-magick "$SOURCE" -resize 256x256 -filter Lanczos "$ABOUT_LOGO"
-echo "→ readme logo: $README_LOGO (200)"
-magick "$SOURCE" -resize 200x200 -filter Lanczos "$README_LOGO"
+# 2) Logo for the About page + README — PADDED + transparent (floats as a rounded
+# icon rather than filling the frame edge-to-edge). The source art nearly fills its
+# canvas, so without padding the dark icon body reads as a hard-edged box on the
+# About panel. Center the art at ~84% with a transparent margin.
+echo "→ about logo:  $ABOUT_LOGO (256, padded)"
+magick "$SOURCE" -resize 216x216 -filter Lanczos -background none -gravity center -extent 256x256 "$ABOUT_LOGO"
+echo "→ readme logo: $README_LOGO (200, padded)"
+magick "$SOURCE" -resize 168x168 -filter Lanczos -background none -gravity center -extent 200x200 "$README_LOGO"
 
 # 3) GitHub social-preview banner (1280x640): logo left, title + tagline + pillars.
 echo "→ social banner: $SOCIAL_BANNER (1280x640)"

@@ -41,9 +41,9 @@ use crate::cloud_object::model::generic_string_model::StringModel;
 use crate::network::NetworkStatus;
 #[cfg(not(target_family = "wasm"))]
 use crate::search::ai_context_menu::view::AIContextMenu;
+use crate::settings::AISettings;
 #[cfg(not(target_family = "wasm"))]
 use crate::settings::InputSettings;
-use crate::settings::AISettings;
 use crate::settings_view::SettingsSection;
 use crate::terminal::input::MenuPositioningProvider;
 use crate::terminal::keys::TerminalKeybindings;

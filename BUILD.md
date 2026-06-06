@@ -93,12 +93,27 @@ Log file: `~/Library/Logs/warp-oss.log`.
 
 | Command | Purpose |
 |---|---|
-| `cargo build --bin warp-oss --features gui` | Build the OSS binary. |
+| `cargo build --bin tarp --features gui` | Build the OSS binary. |
 | `./script/run` | Build + bundle + launch (OSS). |
 | `./script/run --dont-open` | Build + bundle, don't launch. |
 | `cargo nextest run --no-fail-fast --workspace --exclude command-signatures-v2` | Test suite. |
 | `./script/presubmit` | fmt + clippy + tests. |
 | `./script/format` | Format. |
+
+## Producing a release build (DMG)
+
+The commands above produce a fast **debug** app for local testing. A distributable,
+release-optimized DMG is produced by the bundle script's `oss` channel:
+
+```sh
+brew install create-dmg                              # one-time
+./script/bundle --channel oss --nouniversal --nosign # unsigned arm64 DMG
+# → target/release-lto/bundle/osx/Tarp.dmg
+```
+
+In practice you don't run this by hand — pushing a `vX.Y.Z` tag runs it on CI and
+publishes a GitHub Release. See [`RELEASING.md`](RELEASING.md) for the tag-driven
+flow, signing/notarization, and the unsigned-app install workaround.
 
 ## Known gotchas
 

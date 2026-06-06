@@ -43,15 +43,20 @@ entails. Newest concerns first. See [`DECISIONS.md`](DECISIONS.md) for rationale
   breakage (objc/Metal/`platform/mac`) surfaces only at release time. Add a macOS
   `./script/bundle --channel oss --nouniversal --check-only` job (cheap `cargo check`
   with release features) to PR CI. (Costs macOS minutes per push — weigh it.)
-- **Ad-hoc codesign seal warning.** `codesign --verify` on the unsigned bundle prints
-  "code has no resources but signature indicates they must be present" (benign; app
-  still launches via the documented workaround). Goes away when real Developer ID
-  signing is enabled — no action needed until then.
-- **Code signing + notarization.** *Wired but inactive.* The release workflow
-  auto-signs+notarizes once the `APPLE_*` repo secrets are configured (needs an Apple
-  **Developer ID Application** cert; `APPLE_TEAM_ID` is now env-overridable in
-  `script/macos/bundle`). Until then, downloads are unsigned (Gatekeeper workaround
-  in docs). Windows Authenticode still TODO.
+- ✅ **DONE — valid ad-hoc signature.** The unsigned path now does a clean
+  `codesign --force --deep --sign -` (script/macos/bundle), so a quarantined
+  download shows the *openable* "Apple could not verify…" prompt (Privacy & Security
+  → Open Anyway, or `xattr`) instead of "Tarp is damaged" (which a broken seal
+  caused). Verified on a quarantined test bundle.
+- **Code signing + notarization (next step — account ready).** Owner has an Apple
+  Developer account; ship ad-hoc for now, do this later. *Wired but inactive*: the
+  release workflow auto-signs+notarizes once these 6 repo secrets exist —
+  `APPLE_DEVELOPER_ID_CERT` (base64 .p12), `APPLE_DEVELOPER_ID_CERT_PASSWORD`,
+  `APPLE_TEAM_ID`, `APPLE_NOTARIZATION_APPLE_ID`, `APPLE_NOTARIZATION_PASSWORD`,
+  `APPLE_CODESIGN_KEYCHAIN_PASSWORD`. Needs a **Developer ID Application** cert + an
+  app-specific password; see `RELEASING.md`. Then downloads open with no prompt.
+  (Verify the `-s "$APPLE_TEAM_ID"` identity match + `notarytool` path on first run.)
+  Windows Authenticode still TODO.
 - **Expand the release matrix.** v1 is macOS **arm64 only** (`--nouniversal`). Add:
   Intel/universal2 macOS, Linux (`script/linux/bundle` → deb/AppImage), Windows
   (`script/windows/bundle.ps1` → Inno `.exe`) — each once build-verified for Tarp.

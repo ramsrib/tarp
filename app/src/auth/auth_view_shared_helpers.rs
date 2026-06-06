@@ -449,7 +449,7 @@ pub fn render_privacy_settings_toggles<A: Action + Clone + 'static>(
         .with_child(
             Shrinkable::new(
                 1.,
-                render_privacy_settings_section_header("Help improve Warp", appearance).finish(),
+                render_privacy_settings_section_header("Help improve Tarp", appearance).finish(),
             )
             .finish(),
         )

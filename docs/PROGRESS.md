@@ -16,10 +16,16 @@ Companion to [`../TARP-PLAN.md`](../TARP-PLAN.md) (the plan) and
   because the build is unsigned). Tarp has no app-group → return `None` for the OSS
   channel (callers fall back to the state dir). Fixes it even unsigned.
   (`crates/warp_core/src/paths.rs` — tracked-crate edit, gated to OSS.)
-- **Fixed macOS 26 (Tahoe) icon "platter".** The release path's `update_plist` set
-  `UIDesignRequiresCompatibility = true` (opt out of Liquid Glass), which makes
-  Tahoe render the icon on a legacy light card (shrunken icon). The dev path never
-  set it — why dev looked right. Now skipped for the `tarp` scheme → native icon.
+- **Fixed macOS 26 (Tahoe) icon "platter".** Real cause: the app icon was
+  transparent-**padded** (~84% art), which Tahoe renders on a light platter (small
+  icon in a white card). Fix: regenerate the icon **full-bleed/opaque** (flatten onto
+  the dark bg, fill the canvas) so Tahoe masks it into the system squircle
+  (`gen_brand_assets.sh` app-icon step). (First suspected `UIDesignRequiresCompatibility`
+  in `update_plist` — removing it for `tarp` did NOT fix it, so that was a red herring;
+  the permission-string/entitlement cleanup there still stands as a privacy win.)
+- **Default cursor → Tarp olive-green.** The default (Adeberry) theme's cursor fell
+  back to its steel-blue accent; set it to `#7E9B3F`. Per-theme behavior unchanged
+  (other themes keep their own cursor). Revisit all default themes later — BACKLOG.
 - **Privacy/branding in `update_plist` + `Entitlements.plist`:** dropped the
   Warp-branded camera/mic/contacts/calendars/location/photos usage descriptions
   and entitlements + the Warp app-group; kept only a Tarp-worded AppleScript one.

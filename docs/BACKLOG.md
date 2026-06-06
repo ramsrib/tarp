@@ -6,6 +6,11 @@ entails. Newest concerns first. See [`DECISIONS.md`](DECISIONS.md) for rationale
 
 ## Branding / identity
 
+- **Revisit the default themes.** Only the default (Adeberry) theme has been
+  Tarp-tuned so far — its cursor is set to the brand olive-green (`#7E9B3F`) instead
+  of falling back to its steel-blue accent (`app/src/themes/default_themes.rs`). The
+  other bundled themes still carry upstream Warp palettes; do a pass to align/curate
+  them (cursor colors, accents, naming) to Tarp's look.
 - **Rename `WARP_*` shell-integration env vars → `TARP_*`.** They ARE user-exposed
   (exported into the shell; visible via `env`), so per ADR-008 they qualify. Deferred
   because it's a large, tightly-coupled change — ~38 distinct names across the shell

@@ -8,6 +8,25 @@ Companion to [`../TARP-PLAN.md`](../TARP-PLAN.md) (the plan) and
 
 ## 2026-06-05
 
+### Full Warp→Tarp visible-string audit + identity  ✅ (merged `e4404b03`, `60795c71`)
+- **Visible-label sweep (agent):** 151 files, ~466 user-visible "Warp" strings →
+  "Tarp" across window titles, settings UI (incl. Input-type radio), menus,
+  notifications/banners/tooltips, AI/assistant text, onboarding/dialogs, plugin
+  prompts, SSH/Tarpify ("Warpify"→"Tarpify"). Build green, no tracked-crate edits.
+- **Identity / paths:** `oss.rs` AppId→dev/tarp/Tarp, logfile `warp-oss.log`→
+  `tarp.log`, embedded plist→Tarp (`8f404a14`); config dir `~/.warp-oss`→`~/.tarp`,
+  data dir via AppId; `TERM_PROGRAM`→`TarpTerminal` + XTVERSION self-id `Tarp(ver)`
+  (`60795c71`).
+- **Kept intentionally (not user-visible / functional):** `WARP_*` shell-integration
+  env vars (terminal↔shell contract, ~38 names/~87 read-sites — renaming = high
+  risk, zero branding value); Rust identifiers/types/feature-flag names/crate names;
+  `warpdotdev`/`docs.warp.dev` upstream URLs; `warp-oss` artifact names in
+  `autoupdate/*` (must match release artifacts; autoupdate is disabled anyway);
+  telemetry event payload strings (backend, not UI); the required Denver copyright.
+- **Open decisions (agent-flagged):** "Tarpify" verb (applied — confirm); "Warp's
+  Terms of Service" link still points at Warp's ToS (Tarp has none — recommend
+  removing the link); telemetry payload rebrand (optional, not UI).
+
 ### UI sweep 2: input footer + palette + menus + vim banner  ✅ (merged `2bb007b2`)
 Second worktree-agent pass (`ff7e6951`..`2bb007b2`), build green, command input intact:
 - **Input bar** (the real one = `terminal/universal_developer_input.rs`, NOT the

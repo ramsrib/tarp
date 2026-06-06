@@ -1152,7 +1152,8 @@ define_settings_group!(AISettings, settings: [
 
     should_render_use_agent_footer_for_user_commands: ShouldRenderUseAgentToolbarForUserCommands {
         type: bool,
-        default: true,
+        // Tarp: no AI/agent surfaces. Don't show the "Use Agent" footer.
+        default: false,
         supported_platforms: SupportedPlatforms::ALL,
         sync_to_cloud: SyncToCloud::Globally(RespectUserSyncSetting::Yes),
         private: false,
@@ -1164,7 +1165,9 @@ define_settings_group!(AISettings, settings: [
     // This is independent of the "Use Agent" footer setting.
     should_render_cli_agent_footer: ShouldRenderCLIAgentToolbar {
         type: bool,
-        default: true,
+        // Tarp: no AI/agent surfaces. Don't show the CLI coding-agent footer
+        // (the toolbar that appears when running Claude/Codex/Gemini/etc.).
+        default: false,
         supported_platforms: SupportedPlatforms::ALL,
         sync_to_cloud: SyncToCloud::Globally(RespectUserSyncSetting::Yes),
         private: false,

@@ -39,8 +39,36 @@ permissions:
   contents: write   # create the GitHub Release + upload assets
 
 jobs:
+  # Fast, cheap gate BEFORE the ~1.5h macOS build: refuse to ship off a commit
+  # that isn't formatted or doesn't compile. Runs on Linux (fmt is OS-agnostic;
+  # a Linux compile check catches the shared-code breakage cheaply) and reuses
+  # the warm "linux" cache that CI keeps fresh on main. Mac-only compile errors
+  # still surface in the build job below.
+  preflight:
+    name: Preflight (fmt + check)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
+      - name: Install system build dependencies
+        run: ./script/linux/install_build_deps
+      - name: Install pinned Rust toolchain
+        run: rustup show
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: linux
+          cache-all-crates: "true"
+          save-if: ${{ github.ref == 'refs/heads/main' }}
+      - name: Format check
+        run: cargo fmt --all -- --check
+      - name: Compile check (gui)
+        run: cargo check --locked --bin tarp --features gui
+
   build-macos:
     name: Build macOS (arm64)
+    needs: preflight
     runs-on: macos-latest
     timeout-minutes: 120
     steps:

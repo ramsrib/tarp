@@ -76,7 +76,7 @@ const USER_SECRET_REGEX_DESCRIPTION: &str =
 const TELEMETRY_DESCRIPTION_OLD: &str =
     "App analytics help us make the product better for you. We only collect \
     app usage metadata, never console input or output.";
-const TELEMETRY_TITLE: &str = "Help improve Warp";
+const TELEMETRY_TITLE: &str = "Help improve Tarp";
 const TELEMETRY_DESCRIPTION: &str =
     "App analytics help us make the product better for you. We may collect \
     certain console interactions to improve Warp's AI capabilities.";

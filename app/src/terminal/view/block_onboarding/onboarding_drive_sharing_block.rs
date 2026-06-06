@@ -44,7 +44,7 @@ impl Entity for OnboardingDriveSharingBlock {
     type Event = ();
 }
 
-const TITLE_TEXT: &str = "Sharing in Warp Drive";
+const TITLE_TEXT: &str = "Sharing in Tarp Drive";
 const BODY_TEXT: &[&str] = &[
     "You can now share drive objects, in Warp or on the web, with anyone - Warp user or not. Click Share in the Warp Drive menu or the pane header to share via link or email.",
     "You’ll be able to modify the access permissions any time.",

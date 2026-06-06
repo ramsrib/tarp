@@ -179,17 +179,17 @@ impl CliAgentPluginManager for CodexPluginManager {
 
 static PLUGIN_INSTALL_INSTRUCTIONS: LazyLock<PluginInstructions> =
     LazyLock::new(|| PluginInstructions {
-        title: "Install Warp Plugin for Codex",
+        title: "Install Tarp Plugin for Codex",
         subtitle: "Run the following commands, then restart Codex.",
         steps: &[
             PluginInstructionStep {
-                description: "Add the Warp plugin marketplace repository",
+                description: "Add the Tarp plugin marketplace repository",
                 command: "codex plugin marketplace add warpdotdev/codex-warp",
                 executable: true,
                 link: None,
             },
             PluginInstructionStep {
-                description: "Install the Warp plugin",
+                description: "Install the Tarp plugin",
                 command: "codex plugin add warp@codex-warp",
                 executable: true,
                 link: None,
@@ -200,8 +200,8 @@ static PLUGIN_INSTALL_INSTRUCTIONS: LazyLock<PluginInstructions> =
 
 static NATIVE_INSTALL_INSTRUCTIONS: LazyLock<PluginInstructions> = LazyLock::new(|| {
     PluginInstructions {
-        title: "Enable Warp Notifications for Codex",
-        subtitle: "Update Codex to the latest version, then enable in-focus notifications so Warp can display them while you work.",
+        title: "Enable Tarp Notifications for Codex",
+        subtitle: "Update Codex to the latest version, then enable in-focus notifications so Tarp can display them while you work.",
         steps: &[
             PluginInstructionStep {
                 description: "Update Codex to the latest version.",
@@ -229,7 +229,7 @@ static EMPTY_INSTRUCTIONS: LazyLock<PluginInstructions> = LazyLock::new(|| Plugi
 
 static PLUGIN_UPDATE_INSTRUCTIONS: LazyLock<PluginInstructions> =
     LazyLock::new(|| PluginInstructions {
-        title: "Update Warp Plugin for Codex",
+        title: "Update Tarp Plugin for Codex",
         subtitle: "Run the following commands, then restart Codex.",
         steps: &[
             PluginInstructionStep {
@@ -239,7 +239,7 @@ static PLUGIN_UPDATE_INSTRUCTIONS: LazyLock<PluginInstructions> =
                 link: None,
             },
             PluginInstructionStep {
-                description: "Reinstall the Warp plugin",
+                description: "Reinstall the Tarp plugin",
                 command: "codex plugin add warp@codex-warp",
                 executable: true,
                 link: None,

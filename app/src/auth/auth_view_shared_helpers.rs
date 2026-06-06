@@ -184,7 +184,7 @@ where
                 Container::new(
                     appearance
                         .ui_builder()
-                        .span("Using Warp Offline")
+                        .span("Using Tarp Offline")
                         .with_style(header_styles)
                         .build()
                         .finish(),
@@ -468,7 +468,7 @@ pub fn render_privacy_settings_toggles<A: Action + Clone + 'static>(
 
     let telemetry_description = render_description(
         appearance,
-        "High-level feature usage data helps Warp's product team prioritize the roadmap.".into(),
+        "High-level feature usage data helps Tarp's product team prioritize the roadmap.".into(),
     );
 
     let telemetry_link = Flex::row()
@@ -513,7 +513,7 @@ pub fn render_privacy_settings_toggles<A: Action + Clone + 'static>(
 
     let crash_reporting_description = render_description(
         appearance,
-        "Crash reporting helps Warp's engineering team understand stability and improve performance.".into(),
+        "Crash reporting helps Tarp's engineering team understand stability and improve performance.".into(),
     );
 
     let toggle_cloud = actions.toggle_cloud_conversation_storage.clone();

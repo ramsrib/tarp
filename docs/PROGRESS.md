@@ -8,6 +8,34 @@ Companion to [`../TARP-PLAN.md`](../TARP-PLAN.md) (the plan) and
 
 ## 2026-06-05
 
+### Post-v0.1.0 macOS fixes + release hardening  🟡 (dev-verified; ships in v0.1.1)
+- **Fixed every-launch "access data from other apps" prompt.** Root cause:
+  `secure_state_dir()` → `app_group_container_path()` probed the *upstream Warp*
+  app-group container (`2BBY89MBSN.dev.warp`) with a tempfile write on launch →
+  macOS 26 flags it as accessing another app's data (and never persists the grant
+  because the build is unsigned). Tarp has no app-group → return `None` for the OSS
+  channel (callers fall back to the state dir). Fixes it even unsigned.
+  (`crates/warp_core/src/paths.rs` — tracked-crate edit, gated to OSS.)
+- **Fixed macOS 26 (Tahoe) icon "platter".** The release path's `update_plist` set
+  `UIDesignRequiresCompatibility = true` (opt out of Liquid Glass), which makes
+  Tahoe render the icon on a legacy light card (shrunken icon). The dev path never
+  set it — why dev looked right. Now skipped for the `tarp` scheme → native icon.
+- **Privacy/branding in `update_plist` + `Entitlements.plist`:** dropped the
+  Warp-branded camera/mic/contacts/calendars/location/photos usage descriptions
+  and entitlements + the Warp app-group; kept only a Tarp-worded AppleScript one.
+  A privacy-first terminal now requests none of those (relevant once signed).
+- **Release preflight gate (`release.yml`):** a fast Linux job (`cargo fmt --check`
+  + `cargo check --features gui`) now gates the ~1.5h macOS build — a release can't
+  be cut from an unformatted/non-compiling commit, and bad commits fail in minutes.
+  Validated: the fmt step caught/passed correctly; cancelled the run before the full
+  build to save minutes.
+- **Caching:** CI Linux build + release preflight share a `linux` rust-cache key
+  (preflight reuses the cache CI keeps warm on main); `cache-all-crates` on all
+  rust-cache uses (incl. the macOS release cache) so caches survive feature/lockfile
+  tweaks. Existing warm macOS cache preserved (key unchanged).
+- **Status:** dev build installed for the popup/icon check; once confirmed, **v0.1.1**
+  ships both macOS fixes to the published DMG.
+
 ### v0.1.0 shipped — first public release  🎉
 - **Released:** [`v0.1.0`](https://github.com/ramsrib/tarp/releases/tag/v0.1.0) (public,
   not draft) with `Tarp-macos-arm64.dmg` (154 MB) + `THIRD_PARTY_LICENSES.txt` (1.3 MB).

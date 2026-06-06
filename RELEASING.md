@@ -55,16 +55,20 @@ bundle script's signing identity (it falls back to the upstream value if unset).
 
 ## Installing an unsigned build (macOS)
 
-Because v1 is unsigned, macOS Gatekeeper blocks the first launch. Either:
+Because v1 is unsigned (ad-hoc), macOS Gatekeeper blocks the first launch. On
+Apple Silicon it usually shows **"Tarp is damaged and can't be opened"** (it is not
+actually damaged — that's just how macOS reports an unsigned, quarantined app).
 
-- **Right-click → Open** the app and confirm in the dialog (one time), **or**
-- Clear the quarantine attribute from a terminal:
+Clear the download quarantine once, from Terminal:
 
-  ```sh
-  xattr -dr com.apple.quarantine /Applications/Tarp.app
-  ```
+```sh
+xattr -dr com.apple.quarantine /Applications/Tarp.app
+```
 
-After that it launches normally.
+Then open it normally. Note: *right-click → Open* only bypasses the milder
+"unidentified developer" warning and generally does **not** clear "damaged" on
+Apple Silicon — use the `xattr` command. (Real signing + notarization removes the
+prompt entirely; see the signing section above.)
 
 ## Not yet automated
 

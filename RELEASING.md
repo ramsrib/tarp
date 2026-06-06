@@ -55,20 +55,20 @@ bundle script's signing identity (it falls back to the upstream value if unset).
 
 ## Installing an unsigned build (macOS)
 
-Because v1 is unsigned (ad-hoc), macOS Gatekeeper blocks the first launch. On
-Apple Silicon it usually shows **"Tarp is damaged and can't be opened"** (it is not
-actually damaged — that's just how macOS reports an unsigned, quarantined app).
+Because v1 is unsigned (ad-hoc), macOS blocks the first launch with *"Apple could
+not verify "Tarp" is free of malware…"* (it's fine — that's just how macOS reports
+an unsigned, quarantined download). The bundle is given a **valid ad-hoc signature**
+(`codesign --force --deep --sign -` in `script/macos/bundle`'s unsigned path) so it
+shows this *openable* prompt rather than "damaged" (a broken/inconsistent seal is
+what triggers "damaged").
 
-Clear the download quarantine once, from Terminal:
+Open it once, either way:
+- **No Terminal:** click **Done**, then **System Settings → Privacy & Security** →
+  scroll down → **Open Anyway** → confirm.
+- **Terminal:** `xattr -dr com.apple.quarantine /Applications/Tarp.app`.
 
-```sh
-xattr -dr com.apple.quarantine /Applications/Tarp.app
-```
-
-Then open it normally. Note: *right-click → Open* only bypasses the milder
-"unidentified developer" warning and generally does **not** clear "damaged" on
-Apple Silicon — use the `xattr` command. (Real signing + notarization removes the
-prompt entirely; see the signing section above.)
+Real signing + notarization removes the prompt entirely (see the signing section
+above).
 
 ## Not yet automated
 

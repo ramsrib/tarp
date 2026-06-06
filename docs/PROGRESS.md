@@ -8,7 +8,7 @@ Companion to [`../TARP-PLAN.md`](../TARP-PLAN.md) (the plan) and
 
 ## 2026-06-05
 
-### Release engineering — tag-driven downloadable build (M4, ADR-009)  🟡 in validation
+### Release engineering — tag-driven downloadable build (M4, ADR-009)  ✅ validated
 - **`.github/workflows/release.yml`** — on a `vX.Y.Z` tag (or manual dispatch) builds
   the `oss` bundle on a macOS arm64 runner, generates `THIRD_PARTY_LICENSES` via
   `cargo-about`, packages `Tarp-macos-arm64.dmg`, publishes a GitHub Release.
@@ -21,8 +21,12 @@ Companion to [`../TARP-PLAN.md`](../TARP-PLAN.md) (the plan) and
   Download section, BUILD.md release-build section (+ stale `warp-oss`→`tarp` fixes).
 - **Brand fix:** removed the opaque grey backing card + residual halo from the icon
   master; regenerated all assets; updated GitHub repo description.
-- **Status:** workflow validated via `workflow_dispatch` dry-run; first real release
-  awaits a `v*` tag.
+- **Status:** validated via `workflow_dispatch` dry-run (green) — uncached build
+  1h36m on `macos-latest`, produced `Tarp-macos-arm64.dmg` (~154 MB) +
+  `THIRD_PARTY_LICENSES.txt` (~1.3 MB). Metal toolchain + pinned cargo-bundle both
+  fine on the runner. Two issues fixed en route: dispatch ref to a nonexistent tag;
+  missing cargo-bundle (now installed from the pinned fork in-workflow). First real
+  release just awaits a `v*` tag (Publish job runs only on tag/publish=true).
 
 ### Brand assets + logo + handoff  ✅
 - Tarp **app icon** (from `tarp-2` candidate): floodfilled to transparent, re-padded to

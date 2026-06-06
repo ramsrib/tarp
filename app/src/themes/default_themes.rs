@@ -606,7 +606,9 @@ pub(super) fn adeberry() -> WarpTheme {
         Fill::Solid(ColorU::from_u32(0x1D2022FF)),
         ColorU::from_u32(0xE4EEF5FF),
         Fill::Solid(ColorU::from_u32(0x6C96B4FF)),
-        None,
+        // Cursor: Tarp brand olive-green (instead of falling back to the steel-blue
+        // accent), kept bright enough to stay visible on the dark background.
+        Some(Fill::Solid(ColorU::from_u32(0x7E9B3FFF))),
         Some(Details::Darker),
         adeberry_colors(),
         None,

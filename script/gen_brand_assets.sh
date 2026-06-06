@@ -46,12 +46,17 @@ command -v magick >/dev/null 2>&1 || { echo "error: ImageMagick 'magick' not fou
 echo "Source logo: $SOURCE"
 mkdir -p "$(dirname "$ABOUT_LOGO")" "$(dirname "$README_LOGO")" "$(dirname "$SOCIAL_BANNER")"
 
-# 1) App icon — padded to the macOS grid (~84% art, centered, transparent margin).
-echo "→ app icon (padded): $APP_ICON_PNG + $APP_ICON_ICO"
-PADDED="$(mktemp -t tarp_icon_padded).png"
-magick "$SOURCE" -resize 860x860 -filter Lanczos -background none -gravity center -extent 1024x1024 "$PADDED"
-magick "$PADDED" -resize 512x512 "$APP_ICON_PNG"
-magick "$PADDED" -define icon:auto-resize=256,128,64,48,32,16 "$APP_ICON_ICO"
+# 1) App icon — FULL-BLEED, OPAQUE (no transparent padding).
+# macOS 26 (Tahoe) renders transparent-padded legacy icons on a light "platter"
+# (a small icon in a white card); a full-bleed opaque icon gets masked into the
+# system squircle instead. So flatten the source onto the icon's dark background
+# and fill the canvas edge-to-edge; the OS applies the rounded-rect shape.
+ICON_BG="${ICON_BG:-#0d0d0d}"
+echo "→ app icon (full-bleed, bg $ICON_BG): $APP_ICON_PNG + $APP_ICON_ICO"
+FULLBLEED="$(mktemp -t tarp_icon_fullbleed).png"
+magick "$SOURCE" -background "$ICON_BG" -alpha remove -alpha off -resize 1024x1024 -filter Lanczos "$FULLBLEED"
+magick "$FULLBLEED" -resize 512x512 "$APP_ICON_PNG"
+magick "$FULLBLEED" -define icon:auto-resize=256,128,64,48,32,16 "$APP_ICON_ICO"
 
 # 2) Full-bleed logo for the About page + README.
 echo "→ about logo:  $ABOUT_LOGO (256)"
@@ -69,7 +74,7 @@ magick -size 1280x640 "xc:$BG" \
   -font "$BODY_FONT"  -fill "$ACCENT_COLOR"   -pointsize 32  -annotate +568+128 "$PILLARS" \
   "$SOCIAL_BANNER"
 
-rm -f "$PADDED"
+rm -f "$FULLBLEED"
 echo
 echo "Done. Regenerated brand assets from $SOURCE."
 echo "Next: re-bundle the app so the new .icns is baked in:  ./script/run --dont-open"

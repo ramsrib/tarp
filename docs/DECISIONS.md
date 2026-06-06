@@ -142,3 +142,26 @@ user**; leave internal code as-is.
   **Deferred to a dedicated, well-tested pass** — see [`BACKLOG.md`](BACKLOG.md).
 **Why:** maximizes branding cleanliness for what users see while avoiding risky,
 zero-functional-value churn in internal plumbing (also keeps upstream-sync easier).
+
+## ADR-009 — Distribution: tag-driven release, unsigned v1, signing behind secrets
+**Decision (2026-06-05):** Ship downloadable builds via a **tag-driven GitHub
+Actions release** (`v*` → build → publish Release), reusing the existing `oss`
+bundle path; **v1 is unsigned**.
+- **Trigger/scope:** push a `vX.Y.Z` tag (or manual dispatch). v1 builds **macOS
+  arm64 only** (`./script/bundle --channel oss --nouniversal`) — the verified
+  platform; Intel/universal + Linux/Windows are later matrix legs.
+- **Licenses:** `THIRD_PARTY_LICENSES.txt` generated via `cargo-about` during the
+  bundle (release deps), bundled in the app and attached to the Release.
+- **Unsigned v1:** no Apple Developer Program cost; Gatekeeper warns on first launch
+  — install docs cover right-click→Open / `xattr -dr com.apple.quarantine`. The
+  workflow **auto-activates signing + notarization** when the `APPLE_*` repo secrets
+  are present (no workflow edits); `APPLE_TEAM_ID` is now env-overridable in
+  `script/macos/bundle` so a fork signs with its own Developer ID.
+- **DMG hygiene:** the OSS DMG is built from a clean staging dir (only `Tarp.app`),
+  volume name follows the app, and the upstream Warp install-background artwork is
+  dropped (plain DMG).
+- **No auto-update** (`autoupdate_config: None`); updates are manual via Releases.
+**Why:** gets a real, downloadable artifact out cheaply and reproducibly, keeps all
+release logic in the Tarp-owned `script/`/`.github/` surface (zero tracked-crate
+edits, per the CI plan), and makes the signed path a pure secrets-config step later.
+See [`../RELEASING.md`](../RELEASING.md) and [`removal/ci-plan.md`](removal/ci-plan.md).

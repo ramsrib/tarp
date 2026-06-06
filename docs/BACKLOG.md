@@ -25,12 +25,17 @@ entails. Newest concerns first. See [`DECISIONS.md`](DECISIONS.md) for rationale
 
 ## Release engineering (M4)
 
-- **Code signing + notarization.** Builds are ad-hoc signed only (Gatekeeper rejects
-  downloaded copies). Needs an Apple **Developer ID Application** cert + notarization
-  (macOS) and an Authenticode cert (Windows), or ship unsigned with install docs.
-- **Tag-driven release workflow** + packaging (reuse `script/{macos,linux,windows}/bundle*`)
-  + generated `THIRD_PARTY_LICENSES` bundled in the artifact (the dev build uses
-  `NO_LICENSES=1`). See `docs/removal/ci-plan.md`.
+- ✅ **DONE — Tag-driven release workflow.** `.github/workflows/release.yml`: `v*`
+  tag → build `oss` bundle (macOS arm64) → generate `THIRD_PARTY_LICENSES` via
+  `cargo-about` → publish GitHub Release. Unsigned v1 (ADR-009). See `RELEASING.md`.
+- **Code signing + notarization.** *Wired but inactive.* The release workflow
+  auto-signs+notarizes once the `APPLE_*` repo secrets are configured (needs an Apple
+  **Developer ID Application** cert; `APPLE_TEAM_ID` is now env-overridable in
+  `script/macos/bundle`). Until then, downloads are unsigned (Gatekeeper workaround
+  in docs). Windows Authenticode still TODO.
+- **Expand the release matrix.** v1 is macOS **arm64 only** (`--nouniversal`). Add:
+  Intel/universal2 macOS, Linux (`script/linux/bundle` → deb/AppImage), Windows
+  (`script/windows/bundle.ps1` → Inno `.exe`) — each once build-verified for Tarp.
 - **Auto-update:** none today (`autoupdate_config: None`; the updater pointed at
   Warp's server). Decide: manual updates via GitHub Releases, or build a
   GitHub-Releases-based self-updater.

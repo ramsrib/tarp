@@ -8,7 +8,34 @@ Companion to [`../TARP-PLAN.md`](../TARP-PLAN.md) (the plan) and
 
 ## 2026-06-05
 
-### Post-v0.1.0 macOS fixes + release hardening  🟡 (dev-verified; ships in v0.1.1)
+### Post-v0.1.0 polish — rebuilt and republished as v0.1.0  ✅ (dev-verified)
+The first `v0.1.0` was unusable (launch popup). After fixing that and a batch of
+visual/UX issues, the broken `v0.1.0` release+tag was deleted and `v0.1.0` rebuilt
+from the fixed code (solo user, no downloads — re-tagging the same version is fine).
+What landed:
+- **Rainfly theme (new Tarp default).** `Rainfly Dark` (`#121212`, olive-green
+  `#7E9B3F` accent+cursor, no Warp bg image) + `Rainfly Light` (warm off-white).
+  Wired as `#[default]` and the Sync-with-OS slots `{light: RainflyLight, dark:
+  RainflyDark}`. Earlier the default was Warp's `Dark`/`Phenomenon` (blue cursor +
+  Warp bg artwork). Other themes untouched. Revisit the rest later (BACKLOG).
+- **Themed text selection.** `text_selection_color()` was a hardcoded blue; now
+  derives from the theme accent (Rainfly → olive-green). Tracked-crate edit
+  (`warp_core` color.rs), the documented "theme this later" hook.
+- **Agent footers off by default.** Running a coding agent (Claude Code/Codex/…)
+  showed Warp's CLI-agent footer (sparkle/attach/File explorer/agent-settings → an
+  empty page); the "Use Agent" footer showed for normal commands. Both default to
+  false now (`should_render_cli_agent_footer`, `should_render_use_agent_footer_*`).
+- **Icon root-fix.** The icon only existed as a flattened mockup on white with a
+  baked drop shadow (`~/Desktop/tarp-2.png`); pixel-surgery left a dark box or a
+  white halo. Re-extracted the rounded device from the original with a mask tuned
+  just inside the edge (no shadow, no halo) → new shadow-free `AppIcon-source.png`.
+  Logos now render **full-bleed + squircle-masked** (mirrors the Dock's masked look,
+  so the device bezel blends instead of floating on the About panel).
+- **In-app version fix.** `release.yml` now passes `--release-tag`, so the About
+  page shows the real version (was `v#.##.###` because `app_version()` reads
+  `option_env!("GIT_RELEASE_TAG")`, never set during the build).
+
+### Post-v0.1.0 macOS fixes + release hardening  ✅ (in v0.1.0 rebuild)
 - **Fixed every-launch "access data from other apps" prompt.** Root cause:
   `secure_state_dir()` → `app_group_container_path()` probed the *upstream Warp*
   app-group container (`2BBY89MBSN.dev.warp`) with a tempfile write on launch →

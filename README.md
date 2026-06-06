@@ -5,7 +5,7 @@
 <h1 align="center">Tarp</h1>
 
 <p align="center">
-  A plain, fast terminal — the terminal left after the extra layers are pulled away.
+  A plain, modern terminal — the terminal left after the extra layers are pulled away.
 </p>
 
 <p align="center">

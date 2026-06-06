@@ -50,6 +50,10 @@ pub enum ThemeKind {
     #[schemars(description = "Phenomenon")]
     Phenomenon,
     #[default]
+    #[schemars(description = "Rainfly Dark")]
+    RainflyDark,
+    #[schemars(description = "Rainfly Light")]
+    RainflyLight,
     #[schemars(description = "Dark")]
     Dark,
     #[schemars(description = "Dracula")]
@@ -129,6 +133,8 @@ impl std::fmt::Display for ThemeKind {
             ThemeKind::WillowDream => "Willow Dream",
             ThemeKind::FancyDracula => "Fancy Dracula",
             ThemeKind::Phenomenon => "Phenomenon",
+            ThemeKind::RainflyDark => "Rainfly Dark",
+            ThemeKind::RainflyLight => "Rainfly Light",
             ThemeKind::SolarFlare => "Solar Flare",
             ThemeKind::Adeberry => "Adeberry",
             ThemeKind::SentReferralReward => "Tarp Referral",
@@ -489,6 +495,8 @@ impl WarpThemeConfig {
             (ThemeKind::WillowDream, willow_dream()),
             (ThemeKind::FancyDracula, fancy_dracula()),
             (ThemeKind::Phenomenon, phenomenon()),
+            (ThemeKind::RainflyDark, rainfly_dark()),
+            (ThemeKind::RainflyLight, rainfly_light()),
             (ThemeKind::SolarFlare, solar_flare()),
             (ThemeKind::Adeberry, adeberry()),
         ]);
@@ -555,8 +563,8 @@ impl RespectSystemTheme {
 impl Default for SelectedSystemThemes {
     fn default() -> Self {
         Self {
-            light: ThemeKind::Light,
-            dark: ThemeKind::Dark,
+            light: ThemeKind::RainflyLight,
+            dark: ThemeKind::RainflyDark,
         }
     }
 }

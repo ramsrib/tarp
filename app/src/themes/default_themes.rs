@@ -424,6 +424,42 @@ pub(super) fn phenomenon() -> WarpTheme {
     )
 }
 
+/// Rainfly Dark — Tarp's own default theme. A clean dark base with the Tarp
+/// olive-green as the accent + cursor, a neutral ANSI palette, and (unlike
+/// Phenomenon) no background image. Named after the waterproof tarp pitched over
+/// a tent.
+pub(super) fn rainfly_dark() -> WarpTheme {
+    WarpTheme::new(
+        Fill::Solid(ColorU::from_u32(0x121212FF)),
+        ColorU::from_u32(0xFAF9F6FF),
+        // Accent + cursor: Tarp brand olive-green (cursor: None inherits accent).
+        Fill::Solid(ColorU::from_u32(0x7E9B3FFF)),
+        None,
+        Some(Details::Darker),
+        phenomenon_colors(),
+        // No background image — Tarp's default ships no inherited artwork.
+        None,
+        Some("Rainfly Dark".to_string()),
+    )
+}
+
+/// Rainfly Light — the light-mode counterpart to [`rainfly_dark`]. Warm off-white
+/// base, the same Tarp olive-green accent + cursor, and a light ANSI palette.
+/// Paired with `rainfly_dark()` for "Sync with OS" (light slot).
+pub(super) fn rainfly_light() -> WarpTheme {
+    WarpTheme::new(
+        Fill::Solid(ColorU::from_u32(0xF6F5F2FF)),
+        ColorU::from_u32(0x1A1A1AFF),
+        // Same brand olive-green accent + cursor as the dark variant.
+        Fill::Solid(ColorU::from_u32(0x7E9B3FFF)),
+        None,
+        Some(Details::Lighter),
+        light_mode_colors(),
+        None,
+        Some("Rainfly Light".to_string()),
+    )
+}
+
 /// Bundled themes with background images
 pub(super) fn jellyfish() -> WarpTheme {
     WarpTheme::new(
@@ -606,9 +642,7 @@ pub(super) fn adeberry() -> WarpTheme {
         Fill::Solid(ColorU::from_u32(0x1D2022FF)),
         ColorU::from_u32(0xE4EEF5FF),
         Fill::Solid(ColorU::from_u32(0x6C96B4FF)),
-        // Cursor: Tarp brand olive-green (instead of falling back to the steel-blue
-        // accent), kept bright enough to stay visible on the dark background.
-        Some(Fill::Solid(ColorU::from_u32(0x7E9B3FFF))),
+        None,
         Some(Details::Darker),
         adeberry_colors(),
         None,

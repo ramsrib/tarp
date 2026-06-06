@@ -113,7 +113,9 @@ jobs:
       # is Tarp's target platform. A universal2 build is a later enhancement.
       - name: Bundle OSS (unsigned)
         if: steps.sign.outputs.mode == 'unsigned'
-        run: ./script/bundle --channel oss --nouniversal --nosign
+        # --release-tag compiles the version (GIT_RELEASE_TAG) into the binary so
+        # the About page shows it (app_version() reads option_env!("GIT_RELEASE_TAG")).
+        run: ./script/bundle --channel oss --nouniversal --nosign --release-tag "${{ github.event.inputs.tag || github.ref_name }}"
 
       - name: Bundle OSS (signed + notarized)
         if: steps.sign.outputs.mode == 'signed'
@@ -124,7 +126,7 @@ jobs:
           WARP_NOTARIZATION_PASSWORD: ${{ secrets.APPLE_NOTARIZATION_PASSWORD }}
           WARP_CODESIGN_KEYCHAIN_PASSWORD: ${{ secrets.APPLE_CODESIGN_KEYCHAIN_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-        run: ./script/bundle --channel oss --nouniversal --read-passwords-from-env
+        run: ./script/bundle --channel oss --nouniversal --read-passwords-from-env --release-tag "${{ github.event.inputs.tag || github.ref_name }}"
 
       - name: Stage release artifacts
         id: stage

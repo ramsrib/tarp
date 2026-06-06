@@ -16,8 +16,8 @@
 #
 set -euo pipefail
 
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-cd "$REPO_ROOT"
+REPO_ROOT="$(unset CDPATH; cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$REPO_ROOT" >/dev/null
 
 # ----- configuration -------------------------------------------------------
 SOURCE="${1:-app/channels/oss/icon/AppIcon-source.png}"   # square, transparent, rounded

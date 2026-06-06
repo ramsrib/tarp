@@ -57,6 +57,17 @@ jobs:
       - name: Install create-dmg
         run: brew install create-dmg
 
+      # The pinned cargo-bundle fork is required for the .app bundle step.
+      # (Built from source rather than Warp's GCS-cached binary so the release
+      # has no upstream-infra dependency.) Keep the rev in sync with BUILD.md.
+      - name: Install pinned cargo-bundle
+        run: |
+          if ! command -v cargo-bundle >/dev/null 2>&1; then
+            cargo install cargo-bundle \
+              --git=https://github.com/burtonageo/cargo-bundle \
+              --rev ae4c76e92c08774bf54ff077b1c52e3d1cd6c16d
+          fi
+
       - name: Determine signing mode
         id: sign
         env:

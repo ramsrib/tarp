@@ -625,10 +625,27 @@ if [[ $CODESIGN = true ]]; then
 
   echo "Starting codesigning..."
 
+  # Notarization auth: prefer an App Store Connect API key (.p8 + key-id +
+  # issuer) if provided, otherwise fall back to Apple-ID + app-specific
+  # password. The API-key path is preferred for CI — it isn't tied to a
+  # personal Apple ID and survives password changes.
+  if [[ -n "${WARP_NOTARIZATION_API_KEY_PATH:-}" ]]; then
+    NOTARIZE_AUTH=api-key
+  else
+    NOTARIZE_AUTH=apple-id
+  fi
+
   if [[ $READ_PASSWORDS_FROM_ENV = true ]]; then
-    if [ -z "$WARP_NOTARIZATION_PASSWORD" ] ; then
-      echo "WARP_NOTARIZATION_PASSWORD must be set for code signing"
-      exit 1
+    if [[ $NOTARIZE_AUTH = api-key ]]; then
+      if [ -z "${WARP_NOTARIZATION_API_KEY_ID:-}" ] || [ -z "${WARP_NOTARIZATION_API_ISSUER:-}" ]; then
+        echo "API-key notarization needs WARP_NOTARIZATION_API_KEY_PATH, WARP_NOTARIZATION_API_KEY_ID and WARP_NOTARIZATION_API_ISSUER"
+        exit 1
+      fi
+    else
+      if [ -z "${WARP_NOTARIZATION_APPLE_ID:-}" ] || [ -z "${WARP_NOTARIZATION_PASSWORD:-}" ]; then
+        echo "Apple-ID notarization needs WARP_NOTARIZATION_APPLE_ID and WARP_NOTARIZATION_PASSWORD (or set the WARP_NOTARIZATION_API_* vars to use an API key)"
+        exit 1
+      fi
     fi
 
     if [ -z "$WARP_DEVELOPER_ID_CERT_PASSWORD" ] ; then
@@ -795,8 +812,12 @@ fi
 ##############################
 
 if [[ $CODESIGN = true ]]; then
-  echo "Uploading $NOTARIZATION_ARTIFACT to Apple for notarization..."
-  xcrun notarytool submit "$NOTARIZATION_ARTIFACT" --apple-id "$WARP_NOTARIZATION_APPLE_ID" --password "$WARP_NOTARIZATION_PASSWORD" --team-id "$APPLE_TEAM_ID" --wait
+  echo "Uploading $NOTARIZATION_ARTIFACT to Apple for notarization (auth: $NOTARIZE_AUTH)..."
+  if [[ $NOTARIZE_AUTH = api-key ]]; then
+    xcrun notarytool submit "$NOTARIZATION_ARTIFACT" --key "$WARP_NOTARIZATION_API_KEY_PATH" --key-id "$WARP_NOTARIZATION_API_KEY_ID" --issuer "$WARP_NOTARIZATION_API_ISSUER" --wait
+  else
+    xcrun notarytool submit "$NOTARIZATION_ARTIFACT" --apple-id "$WARP_NOTARIZATION_APPLE_ID" --password "$WARP_NOTARIZATION_PASSWORD" --team-id "$APPLE_TEAM_ID" --wait
+  fi
 
   if [[ $STAPLE_TICKET = true ]]; then
     echo "Attempting to staple the notarization ticket to $NOTARIZATION_ARTIFACT..."

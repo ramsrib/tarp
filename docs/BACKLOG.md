@@ -50,11 +50,14 @@ entails. Newest concerns first. See [`DECISIONS.md`](DECISIONS.md) for rationale
   caused). Verified on a quarantined test bundle.
 - **Code signing + notarization (next step — account ready).** Owner has an Apple
   Developer account; ship ad-hoc for now, do this later. *Wired but inactive*: the
-  release workflow auto-signs+notarizes once these 6 repo secrets exist —
+  release workflow auto-signs+notarizes once these 7 repo secrets exist —
   `APPLE_DEVELOPER_ID_CERT` (base64 .p12), `APPLE_DEVELOPER_ID_CERT_PASSWORD`,
-  `APPLE_TEAM_ID`, `APPLE_NOTARIZATION_APPLE_ID`, `APPLE_NOTARIZATION_PASSWORD`,
-  `APPLE_CODESIGN_KEYCHAIN_PASSWORD`. Needs a **Developer ID Application** cert + an
-  app-specific password; see `RELEASING.md`. Then downloads open with no prompt.
+  `APPLE_TEAM_ID`, `APPLE_CODESIGN_KEYCHAIN_PASSWORD`, plus notarization via App
+  Store Connect API key: `APPLE_NOTARIZATION_API_KEY` (base64 .p8),
+  `APPLE_NOTARIZATION_API_KEY_ID`, `APPLE_NOTARIZATION_API_ISSUER`. Needs a
+  **Developer ID Application** cert + an App Store Connect API key; see
+  `RELEASING.md`. (Bundle script also still accepts the legacy Apple-ID +
+  app-specific-password pair as a fallback.) Then downloads open with no prompt.
   (Verify the `-s "$APPLE_TEAM_ID"` identity match + `notarytool` path on first run.)
   Windows Authenticode still TODO.
 - **Expand the release matrix.** v1 is macOS **arm64 only** (`--nouniversal`). Add:

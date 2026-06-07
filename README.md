@@ -41,8 +41,7 @@ the roadmap, [`docs/`](docs/README.md) for the audit and design notes, and
 
 ## Install
 
-macOS, Apple Silicon. Builds are **signed with a Developer ID and notarized by
-Apple**, so they install and launch cleanly through Gatekeeper.
+macOS, Apple Silicon.
 
 ### Homebrew (recommended)
 

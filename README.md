@@ -39,17 +39,26 @@ Gatekeeper step is needed on first launch). See [`TARP-PLAN.md`](TARP-PLAN.md) f
 the roadmap, [`docs/`](docs/README.md) for the audit and design notes, and
 [`docs/PROGRESS.md`](docs/PROGRESS.md) for the work log.
 
-## Download
+## Install
+
+macOS, Apple Silicon. Builds are **signed with a Developer ID and notarized by
+Apple**, so they install and launch cleanly through Gatekeeper.
+
+### Homebrew (recommended)
+
+```sh
+brew install --cask ramsrib/tap/tarp
+```
+
+Update later with `brew upgrade --cask tarp`.
+
+### Manual download
 
 Grab the latest `Tarp-macos-arm64.dmg` from the
-[Releases](https://github.com/ramsrib/tarp/releases) page (macOS, Apple Silicon),
-open it, and drag **Tarp** to Applications.
-
-Releases are **signed with a Developer ID and notarized by Apple**, so it just
-opens — on first launch you may see the standard one-time *"Tarp was downloaded
-from the Internet. Are you sure you want to open it?"* dialog; click **Open**.
-(That's the normal confirmation every downloaded app shows — no "unverified"
-warning and no workaround needed.)
+[Releases](https://github.com/ramsrib/tarp/releases) page, open it, and drag
+**Tarp** to Applications. On first launch you may see the standard one-time
+*"Tarp was downloaded from the Internet. Are you sure you want to open it?"*
+dialog — click **Open**. (The normal confirmation every downloaded app shows.)
 
 Intel/universal, Linux, and Windows builds are not published yet; build from
 source for those. See [`RELEASING.md`](RELEASING.md) for the release process.

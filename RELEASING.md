@@ -43,15 +43,24 @@ configured (Settings → Secrets and variables → Actions) — no workflow edit
 |---|---|
 | `APPLE_DEVELOPER_ID_CERT` | base64 of the *Developer ID Application* certificate `.p12` |
 | `APPLE_DEVELOPER_ID_CERT_PASSWORD` | password for that `.p12` |
-| `APPLE_NOTARIZATION_APPLE_ID` | Apple ID email used by `notarytool` |
-| `APPLE_NOTARIZATION_PASSWORD` | app-specific password for that Apple ID |
 | `APPLE_TEAM_ID` | 10-char Apple Developer Team ID |
 | `APPLE_CODESIGN_KEYCHAIN_PASSWORD` | arbitrary; scoped to the throwaway CI keychain |
+| `APPLE_NOTARIZATION_API_KEY` | base64 of the App Store Connect API key `.p8` |
+| `APPLE_NOTARIZATION_API_KEY_ID` | the key ID (the `<id>` in `AuthKey_<id>.p8`) |
+| `APPLE_NOTARIZATION_API_ISSUER` | the API key's issuer ID (a UUID) |
 
 When present, the workflow builds with `--read-passwords-from-env`; the bundle
 script signs (`codesign -o runtime --timestamp`), notarizes (`xcrun notarytool
 submit --wait`), and staples the ticket. `APPLE_TEAM_ID` flows through to the
 bundle script's signing identity (it falls back to the upstream value if unset).
+
+**Notarization auth.** The bundle script prefers an [App Store Connect API
+key](https://appstoreconnect.apple.com/access/integrations/api) (`.p8` + key ID +
+issuer) — not tied to a personal Apple ID, survives password changes. Create one
+under *Users and Access → Integrations → App Store Connect API* with the
+*Developer* role; download the `.p8` once. The script still accepts the older
+Apple-ID + app-specific-password pair (`WARP_NOTARIZATION_APPLE_ID` /
+`WARP_NOTARIZATION_PASSWORD`) as a fallback if the API-key vars are unset.
 
 ## Installing an unsigned build (macOS)
 

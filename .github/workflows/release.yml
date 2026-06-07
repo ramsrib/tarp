@@ -11,10 +11,11 @@ name: Release
 # repo — no workflow edits needed:
 #   APPLE_DEVELOPER_ID_CERT           base64 of the Developer ID Application .p12
 #   APPLE_DEVELOPER_ID_CERT_PASSWORD  password for that .p12
-#   APPLE_NOTARIZATION_APPLE_ID       Apple ID email used for notarytool
-#   APPLE_NOTARIZATION_PASSWORD       app-specific password for that Apple ID
 #   APPLE_TEAM_ID                     10-char Apple Developer Team ID
 #   APPLE_CODESIGN_KEYCHAIN_PASSWORD  arbitrary; scoped to the CI keychain
+#   APPLE_NOTARIZATION_API_KEY        base64 of the App Store Connect .p8 key
+#   APPLE_NOTARIZATION_API_KEY_ID     the key ID (filename is AuthKey_<id>.p8)
+#   APPLE_NOTARIZATION_API_ISSUER     the API key's issuer ID (UUID)
 #
 # See docs/RELEASING.md for the full flow.
 
@@ -122,11 +123,20 @@ jobs:
         env:
           WARP_DEVELOPER_ID_CERT: ${{ secrets.APPLE_DEVELOPER_ID_CERT }}
           WARP_DEVELOPER_ID_CERT_PASSWORD: ${{ secrets.APPLE_DEVELOPER_ID_CERT_PASSWORD }}
-          WARP_NOTARIZATION_APPLE_ID: ${{ secrets.APPLE_NOTARIZATION_APPLE_ID }}
-          WARP_NOTARIZATION_PASSWORD: ${{ secrets.APPLE_NOTARIZATION_PASSWORD }}
           WARP_CODESIGN_KEYCHAIN_PASSWORD: ${{ secrets.APPLE_CODESIGN_KEYCHAIN_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-        run: ./script/bundle --channel oss --nouniversal --read-passwords-from-env --release-tag "${{ github.event.inputs.tag || github.ref_name }}"
+          # Notarization via App Store Connect API key (.p8). The key is stored
+          # base64-encoded in the secret; decode it to a temp file the bundle
+          # script points notarytool at.
+          APPLE_NOTARIZATION_API_KEY: ${{ secrets.APPLE_NOTARIZATION_API_KEY }}
+          WARP_NOTARIZATION_API_KEY_ID: ${{ secrets.APPLE_NOTARIZATION_API_KEY_ID }}
+          WARP_NOTARIZATION_API_ISSUER: ${{ secrets.APPLE_NOTARIZATION_API_ISSUER }}
+        run: |
+          set -euo pipefail
+          KEY_FILE="$RUNNER_TEMP/notary_api_key.p8"
+          printf '%s' "$APPLE_NOTARIZATION_API_KEY" | base64 -d > "$KEY_FILE"
+          export WARP_NOTARIZATION_API_KEY_PATH="$KEY_FILE"
+          ./script/bundle --channel oss --nouniversal --read-passwords-from-env --release-tag "${{ github.event.inputs.tag || github.ref_name }}"
 
       - name: Stage release artifacts
         id: stage

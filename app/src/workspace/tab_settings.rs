@@ -453,7 +453,8 @@ define_settings_group!(TabSettings, settings: [
     },
     show_code_review_button: ShowCodeReviewButton {
         type: bool,
-        default: true,
+        // Tarp: no code-review feature, so don't show the code-review button on tabs.
+        default: false,
         supported_platforms: SupportedPlatforms::ALL,
         sync_to_cloud: SyncToCloud::Globally(RespectUserSyncSetting::Yes),
         private: false,

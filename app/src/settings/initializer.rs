@@ -6,11 +6,9 @@ use warpui::{Entity, ModelContext, SingletonEntity};
 
 use crate::auth::auth_state::AuthState;
 use crate::report_if_error;
-use crate::settings::input::InputBoxType;
 use crate::settings::{
-    AISettings, FontSettings, InputSettings, PrivacySettings, ThemeSettings, ThinkingDisplayMode,
+    AISettings, FontSettings, PrivacySettings, ThemeSettings, ThinkingDisplayMode,
 };
-use crate::terminal::session_settings::SessionSettings;
 use crate::themes::theme::ThemeKind;
 
 pub struct SettingsInitializer;
@@ -63,27 +61,9 @@ impl SettingsInitializer {
                 })
             }
 
-            let did_update_input_type = InputSettings::handle(ctx).update(ctx, |settings, ctx| {
-                if !settings.input_box_type.is_value_explicitly_set()
-                    && *settings.input_box_type.value() == InputBoxType::Classic
-                {
-                    log::debug!("Setting default input type to Warp prompt for new user");
-                    report_if_error!(settings
-                        .input_box_type
-                        .set_value(InputBoxType::Universal, ctx));
-                    ctx.notify();
-                    return true;
-                }
-                false
-            });
-            // Keep honor_ps1 in sync: Universal input requires honor_ps1 = false.
-            if did_update_input_type {
-                SessionSettings::handle(ctx).update(ctx, |settings, ctx| {
-                    if *settings.honor_ps1.value() {
-                        report_if_error!(settings.honor_ps1.set_value(false, ctx));
-                    }
-                });
-            }
+            // Tarp: do NOT force new users onto the Tarp/Universal input box. The
+            // default is the shell's own PS1 prompt (honor_ps1 = true, classic
+            // input); leaving input_box_type unset lets that default apply.
         }
 
         // Migrate NLD settings when AgentView is enabled.

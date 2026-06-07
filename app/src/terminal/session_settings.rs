@@ -296,7 +296,9 @@ define_settings_group!(SessionSettings, settings: [
     }
     honor_ps1: HonorPS1 {
         type: bool,
-        default: false,
+        // Tarp default: use the shell's own PS1 prompt (classic/shell input) rather
+        // than the Tarp/Universal input box.
+        default: true,
         supported_platforms: SupportedPlatforms::ALL,
         sync_to_cloud: SyncToCloud::Globally(RespectUserSyncSetting::Yes),
         private: false,

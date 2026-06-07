@@ -1441,9 +1441,11 @@ impl AppearanceSettingsPageView {
         let tab_settings = TabSettings::as_ref(ctx);
         let mut tab_settings_widgets: Vec<Box<dyn SettingsWidget<View = Self>>> =
             vec![Box::new(TabIndicatorWidget::default())];
-        if !FeatureFlag::OpenWarpNewSettingsModes.is_enabled() {
-            tab_settings_widgets.push(Box::new(CodeReviewButtonWidget::default()));
-        }
+        // Tarp: no code-review feature, so don't offer the "Show code review button"
+        // tab-bar toggle.
+        // if !FeatureFlag::OpenWarpNewSettingsModes.is_enabled() {
+        //     tab_settings_widgets.push(Box::new(CodeReviewButtonWidget::default()));
+        // }
         if FeatureFlag::FullScreenZenMode.is_enabled()
             && tab_settings
                 .workspace_decoration_visibility

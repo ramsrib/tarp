@@ -2675,7 +2675,11 @@ impl FeaturesPageView {
 
         #[cfg(feature = "local_fs")]
         {
-            if !FeatureFlag::OpenWarpNewSettingsModes.is_enabled() {
+            // Tarp: hide the "Choose an editor to open files from the code review
+            // panel, project explorer, and global search" chooser — all three of
+            // those features are removed, so the chooser (with its "Warp" option)
+            // has nothing to act on.
+            if false {
                 let external_editor_settings =
                     crate::util::file::external_editor::EditorSettings::as_ref(ctx);
                 if external_editor_settings

@@ -22631,11 +22631,11 @@ impl TerminalView {
             .ok()
     }
 
-    fn block_duration_text(model: &TerminalModel, block_index: BlockIndex) -> Option<String> {
-        model
-            .block_list()
-            .block_at(block_index)?
-            .formatted_duration_string()
+    fn block_duration_text(_model: &TerminalModel, _block_index: BlockIndex) -> Option<String> {
+        // Tarp: don't show the per-block command-duration label in the prompt
+        // header. Returning None means the duration element is never rendered
+        // (the call site is `if let Some(duration_string) = ...`).
+        None
     }
 
     fn is_block_duration_live(model: &TerminalModel, block_index: BlockIndex) -> bool {

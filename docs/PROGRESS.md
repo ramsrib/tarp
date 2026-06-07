@@ -6,6 +6,27 @@ Companion to [`../TARP-PLAN.md`](../TARP-PLAN.md) (the plan) and
 
 ---
 
+## 2026-06-07
+
+### v0.1.0 — signed + notarized, plus UX defaults  ✅
+- **Signed + notarized release.** `v0.1.0` rebuilt with a Developer ID cert +
+  notarization (App Store Connect API key, `.p8`). Smoke-tested the published DMG:
+  `spctl` → **accepted, Notarized Developer ID** (`Developer ID Application: …
+  (K456B8M2ZY)`), staple validates, a quarantined copy opens with only the standard
+  one-time "downloaded from the Internet" dialog — no "unverified"/"damaged", no
+  `xattr`. 7 GHA secrets configured; `release.yml` signed path + `notarytool
+  --key/--key-id/--issuer` verified. Old release/tag/build runs deleted and re-cut.
+  Install docs (README/RELEASING) updated to the signed flow; ad-hoc path kept as
+  fallback.
+- **UX defaults (shipped in this v0.1.0):** removed the per-block command-duration
+  label in the prompt header; default input is the **shell PS1 prompt** (not the
+  Tarp/Universal box — `honor_ps1` default true + stopped the initializer forcing
+  Universal); default monospace **font 13→14**; hid the code-review settings (the
+  "Show code review button" tab toggle + default off, and the "Choose an editor…
+  code review panel/project explorer/global search" chooser in Features). All are
+  `app/src` (Tarp-owned). Note: input/font are *defaults* — existing `~/.tarp`
+  profiles keep their persisted values.
+
 ## 2026-06-05
 
 ### Post-v0.1.0 polish — rebuilt and republished as v0.1.0  ✅ (dev-verified)

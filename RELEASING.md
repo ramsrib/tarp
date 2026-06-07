@@ -32,12 +32,11 @@ without creating a public Release. Use this to validate a build before tagging.
 
 ## Signing & notarization
 
-**v1 ships unsigned.** Downloaders get a Gatekeeper warning on first launch; the
-install steps below cover the one-time workaround. This is a deliberate v1 choice
-(no Apple Developer Program cost).
-
-Signing + notarization **auto-activate** the moment these repo secrets are
-configured (Settings → Secrets and variables → Actions) — no workflow edits:
+**Releases are signed (Developer ID) and notarized.** Builds open cleanly through
+Gatekeeper (`spctl` → *accepted, Notarized Developer ID*). Signing + notarization
+**auto-activate** whenever these repo secrets are present (Settings → Secrets and
+variables → Actions) — no workflow edits; if the cert secret is absent the build
+falls back to a valid ad-hoc signature (openable with a one-time Gatekeeper step):
 
 | Secret | What it is |
 |---|---|
@@ -62,22 +61,17 @@ under *Users and Access → Integrations → App Store Connect API* with the
 Apple-ID + app-specific-password pair (`WARP_NOTARIZATION_APPLE_ID` /
 `WARP_NOTARIZATION_PASSWORD`) as a fallback if the API-key vars are unset.
 
-## Installing an unsigned build (macOS)
+## Installing (macOS)
 
-Because v1 is unsigned (ad-hoc), macOS blocks the first launch with *"Apple could
-not verify "Tarp" is free of malware…"* (it's fine — that's just how macOS reports
-an unsigned, quarantined download). The bundle is given a **valid ad-hoc signature**
-(`codesign --force --deep --sign -` in `script/macos/bundle`'s unsigned path) so it
-shows this *openable* prompt rather than "damaged" (a broken/inconsistent seal is
-what triggers "damaged").
+Signed + notarized releases just open: open the DMG, drag **Tarp** to Applications,
+launch it, and click **Open** on the standard one-time *"downloaded from the
+Internet"* dialog. No "unverified" warning, no workaround.
 
-Open it once, either way:
-- **No Terminal:** click **Done**, then **System Settings → Privacy & Security** →
-  scroll down → **Open Anyway** → confirm.
-- **Terminal:** `xattr -dr com.apple.quarantine /Applications/Tarp.app`.
-
-Real signing + notarization removes the prompt entirely (see the signing section
-above).
+**Fallback — an unsigned/ad-hoc build** (if a release is ever cut without the
+signing secrets): the bundle still gets a valid ad-hoc signature
+(`codesign --force --deep --sign -`), so macOS shows the *openable* "Apple could
+not verify…" prompt (not "damaged"). Open it once via **System Settings → Privacy
+& Security → Open Anyway**, or `xattr -dr com.apple.quarantine /Applications/Tarp.app`.
 
 ## Not yet automated
 

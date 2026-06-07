@@ -45,18 +45,14 @@ Grab the latest `Tarp-macos-arm64.dmg` from the
 [Releases](https://github.com/ramsrib/tarp/releases) page (macOS, Apple Silicon),
 open it, and drag **Tarp** to Applications.
 
-Builds are currently **unsigned**, so on first launch macOS blocks the app with
-*"Apple could not verify "Tarp" is free of malware…"* (expected for an unsigned
-download — it's fine). Open it once, either way:
+Releases are **signed with a Developer ID and notarized by Apple**, so it just
+opens — on first launch you may see the standard one-time *"Tarp was downloaded
+from the Internet. Are you sure you want to open it?"* dialog; click **Open**.
+(That's the normal confirmation every downloaded app shows — no "unverified"
+warning and no workaround needed.)
 
-- **No Terminal:** click **Done**, then **System Settings → Privacy & Security**,
-  scroll to the bottom and click **Open Anyway** next to Tarp, then confirm. **or**
-- **Terminal:** `xattr -dr com.apple.quarantine /Applications/Tarp.app`, then open Tarp.
-
-After that it opens normally. Signing/notarization (so downloads open with no
-prompt at all) is a planned follow-up — see [`RELEASING.md`](RELEASING.md).
 Intel/universal, Linux, and Windows builds are not published yet; build from
-source for those.
+source for those. See [`RELEASING.md`](RELEASING.md) for the release process.
 
 ## Building from source
 

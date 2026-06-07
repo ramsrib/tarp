@@ -5,10 +5,10 @@ name: Release
 # also dry-run the build from the Actions tab via workflow_dispatch (no Release
 # is created unless you opt in).
 #
-# v1 ships UNSIGNED (see docs): macOS Gatekeeper will warn on first launch;
-# install docs cover the right-click->Open / xattr workaround. Signing +
-# notarization auto-activate when the Apple secrets below are configured in the
-# repo — no workflow edits needed:
+# Releases are SIGNED (Developer ID) + NOTARIZED when the Apple secrets below are
+# configured in the repo (they are) — Gatekeeper accepts the download cleanly. If
+# the cert secret is ever absent, the build falls back to a valid ad-hoc signature
+# (openable via a one-time Gatekeeper step; see docs). Secrets used:
 #   APPLE_DEVELOPER_ID_CERT           base64 of the Developer ID Application .p12
 #   APPLE_DEVELOPER_ID_CERT_PASSWORD  password for that .p12
 #   APPLE_TEAM_ID                     10-char Apple Developer Team ID

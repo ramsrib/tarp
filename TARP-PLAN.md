@@ -157,13 +157,13 @@ reverse-dependencies before deleting a crate.
 - [ ] Update `flake.nix`, `docker/`, `Dockerfile`-adjacent references.
 
 ### WS4 — Release engineering
-- [ ] Replace upstream's release machinery with a lean GitHub Actions release workflow (tag → build mac/linux/windows → attach artifacts).
-- [ ] Reuse `script/{macos,linux,windows}/bundle*` for `.app`/dmg, deb/rpm/AppImage/Arch, Inno installer.
-- [ ] Decide code signing / notarization story (macOS notarization, Windows signing) — or ship unsigned with clear install docs initially.
-- [ ] Define versioning scheme (drop Warp channel/version model; adopt semver tags `vX.Y.Z`).
-- [ ] Set up an auto-update story or explicitly document "no auto-update" (Warp's updater is cloud-tied — likely remove).
-- [ ] Add a minimal CI: fmt + clippy + tests on PR (slim down `ci.yml`).
-- [ ] Write `INSTALL.md` per platform.
+- [x] Lean GitHub Actions release workflow (tag `v*` → preflight gate → macOS build → publish Release). `release.yml`. Linux/Windows legs still TODO.
+- [x] Reuse `script/macos/bundle` for the `.app`/dmg (oss channel). Linux/Windows bundle scripts exist; not yet wired into CI.
+- [x] **Code signing + notarization (macOS):** Developer ID + notarized (App Store Connect API key); `v0.1.0` verified `spctl` accepted. Windows Authenticode still TODO.
+- [x] Versioning: semver tags `vX.Y.Z` (Warp channel/version model dropped).
+- [ ] Set up an auto-update story or explicitly document "no auto-update" (currently none; `autoupdate_config: None`).
+- [x] Minimal CI: fmt + Linux build on PR (`ci.yml`); preflight gate on release.
+- [x] Install docs in README + `RELEASING.md` (per-platform `INSTALL.md` not needed yet — macOS only).
 
 ### WS5 — License & legal audit (full)
 - [ ] Confirm AGPL-3.0 + MIT split is preserved and we comply (AGPL network-use clause is moot once cloud is gone, but keep the license).
@@ -192,7 +192,7 @@ reverse-dependencies before deleting a crate.
 | Removing AI/cloud cascades into core terminal crates | Large breakage | Map reverse-deps before deleting; gate-then-delete; rebuild per step. |
 | Deleting the `editor` crate by mistake | Breaks input | Treat `editor` as core; only remove the file-editing *feature*. |
 | Auto-updater / release infra deeply tied to Warp cloud | Can't ship updates | WS4 replaces with plain GitHub Releases; document "manual update" v1. |
-| macOS notarization / Windows signing certs | Users get scary warnings | Ship unsigned + docs first; add signing later. |
+| macOS notarization / Windows signing certs | Users get scary warnings | ✅ macOS signed (Developer ID) + notarized as of v0.1.0. Windows Authenticode still TODO. |
 | Forked-OSS deps pinned to warpdotdev disappear | Build breaks long-term | Vendor or re-point to upstream in WS2 (deferred, low urgency). |
 | Trademark/brand residue in shipped binary | Legal | WS3 + WS5 sweeps; verify the built artifact, not just source. |
 | Trademark exposure | Legal (trademark) | Distinct name/logo/visual identity; full removal of upstream brand assets; affiliation disclaimer; nominative fair use only; clearance search. Checklist in [`docs/04-licensing.md`](docs/04-licensing.md#trademark-separate-from-the-code-license). Lock brand identity before first public release. |

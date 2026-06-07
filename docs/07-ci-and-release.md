@@ -59,8 +59,10 @@ Warp's bundling scripts are mature and are the **biggest asset to keep**:
    tags `vX.Y.Z`.
 2. **One release workflow:** on tag push → matrix build (mac/linux/win) → run the
    existing bundle scripts → attach artifacts to a GitHub Release.
-3. **Signing/notarization:** decide per platform. v1 can ship unsigned + clear
-   install docs (Gatekeeper/SmartScreen caveats); add signing later.
+3. **Signing/notarization:** ✅ macOS is **signed (Developer ID) + notarized** (App
+   Store Connect API key) as of `v0.1.0` — Gatekeeper accepts the download. Windows
+   Authenticode still TODO. (If a build is ever cut without the signing secrets, it
+   falls back to a valid ad-hoc signature, openable with a one-time Gatekeeper step.)
 4. **Updater:** Warp's autoupdate is cloud-tied (`autoupdate*` features,
    `autoupdate_ui_revamp`). Remove it; document manual update for v1, or add a
    minimal GitHub-Releases-based self-update later.

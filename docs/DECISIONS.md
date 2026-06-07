@@ -165,3 +165,10 @@ bundle path; **v1 is unsigned**.
 release logic in the Tarp-owned `script/`/`.github/` surface (zero tracked-crate
 edits, per the CI plan), and makes the signed path a pure secrets-config step later.
 See [`../RELEASING.md`](../RELEASING.md) and [`removal/ci-plan.md`](removal/ci-plan.md).
+
+**Update (2026-06-07):** signing is now **active** — `v0.1.0` ships **signed
+(Developer ID) + notarized** (App Store Connect API key); the 7 `APPLE_*` secrets
+are configured and the workflow auto-uses them (falls back to a valid ad-hoc
+signature if absent — which shows the openable "Apple could not verify…" prompt,
+not "damaged"). A **preflight gate** (fmt + compile check) now also gates the build.
+Windows Authenticode remains TODO.

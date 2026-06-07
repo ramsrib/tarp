@@ -21,9 +21,15 @@ no telemetry**.
 | [`TARP-PLAN.md`](TARP-PLAN.md) | Milestones (M0–M6). |
 
 ## Current state (what's done)
-- **Shipped `v0.1.0`** — first public release (macOS arm64, unsigned): tag-driven
-  `release.yml` builds the OSS DMG + `THIRD_PARTY_LICENSES` and publishes a GitHub
-  Release. Smoke-tested end-to-end. Slim `ci.yml` (rustfmt + Linux build) is green.
+- **Shipped `v0.1.0`** — first public release (macOS arm64), **signed (Developer ID)
+  + notarized**: tag-driven `release.yml` (preflight gate → build → publish) builds
+  the OSS DMG + `THIRD_PARTY_LICENSES`. Gatekeeper accepts it (`spctl` → Notarized
+  Developer ID); downloads open with just the standard "Open" dialog. Smoke-tested
+  end-to-end. Slim `ci.yml` (rustfmt + Linux build) green.
+- **Default look/UX:** **Rainfly** theme (dark + light, olive-green accent/cursor,
+  no Warp bg image), themed text selection, shell **PS1** prompt by default, 14px
+  font, no per-block timer, agent footers off. (Themes/inputs are defaults — see
+  PROGRESS / DECISIONS.)
 - **Builds, bundles, launches** as `Tarp.app` (OSS channel). Identity is fully Tarp:
   `dev.tarp.Tarp`, binary `tarp`, `Tarp.app`, `TERM_PROGRAM=TarpTerminal`,
   config `~/.tarp`, log `tarp.log`, custom icon.
@@ -78,11 +84,10 @@ WARP_SKIP_COMMON_SKILLS_INSTALL=1 ./script/run --dont-open   # build + bundle Ta
   `app/channels/oss/icon/AppIcon-source.png` and run `script/gen_brand_assets.sh`.
 
 ## What's next (see `docs/BACKLOG.md`)
-1. **Release hardening (M4 follow-ups):** a **preflight gate** on `release.yml` (fmt
-   + check before the 1.5h build, so red commits can't ship) and a **macOS
-   compile-check in CI** (CI builds Linux only today). Then **code signing +
-   notarization** (wired but inactive — add `APPLE_*` secrets) and expand the matrix
-   (Intel/universal, Linux, Windows). Auto-update: none today.
+1. **Release follow-ups (M4):** done — preflight gate, signed+notarized macOS
+   build. Remaining: a **macOS compile-check in CI** (CI builds Linux only today),
+   **expand the matrix** (Intel/universal2, Linux, Windows + Windows Authenticode),
+   and an **auto-update** decision (none today).
 2. **`WARP_*` → `TARP_*`** env-var rename (exposed but deferred — large/risky; do as
    an isolated pass with a shell-integration test).
 3. Logo/wordmark polish; retire `WARP.md`/`FAQ.md`.

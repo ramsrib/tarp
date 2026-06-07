@@ -176,3 +176,48 @@ jobs:
           generate_release_notes: true
           fail_on_unmatched_files: true
           files: dist/**
+
+  # Auto-bump the Homebrew cask in ramsrib/homebrew-tap so `brew upgrade --cask
+  # tarp` picks up the new version. Requires a HOMEBREW_TAP_TOKEN secret (a PAT
+  # with contents:write on the tap repo) — the cross-repo push can't use the
+  # default GITHUB_TOKEN. If the secret is absent, this is skipped (bump the cask
+  # manually) so the release still succeeds.
+  bump-cask:
+    name: Bump Homebrew cask
+    needs: release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for tap token
+        id: tok
+        env:
+          TOK: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+        run: |
+          if [ -n "$TOK" ]; then
+            echo "have=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "have=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::HOMEBREW_TAP_TOKEN not set — skipping cask bump (bump it manually)."
+          fi
+      - name: Update the cask (version + sha256) and push to the tap
+        if: steps.tok.outputs.have == 'true'
+        env:
+          TOK: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          TAG: ${{ github.event.inputs.tag || github.ref_name }}
+        run: |
+          set -euo pipefail
+          VER="${TAG#v}"
+          DMG_URL="https://github.com/ramsrib/tarp/releases/download/${TAG}/Tarp-macos-arm64.dmg"
+          curl -fL "$DMG_URL" -o tarp.dmg
+          SHA="$(sha256sum tarp.dmg | awk '{print $1}')"
+          git clone --depth 1 "https://x-access-token:${TOK}@github.com/ramsrib/homebrew-tap.git" tap
+          cd tap
+          sed -i -E "s|^  version \".*\"|  version \"${VER}\"|" Casks/tarp.rb
+          sed -i -E "s|^  sha256 \".*\"|  sha256 \"${SHA}\"|" Casks/tarp.rb
+          if git diff --quiet; then
+            echo "Cask already at ${VER}; nothing to bump."
+          else
+            git -c user.name="tarp-release[bot]" -c user.email="tarp-release@users.noreply.github.com" \
+              commit -am "tarp: bump cask to ${VER}"
+            git push origin HEAD:main
+            echo "Bumped tarp cask to ${VER} (sha ${SHA})."
+          fi

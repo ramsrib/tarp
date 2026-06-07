@@ -20,9 +20,38 @@ That's it. The [`Release`](.github/workflows/release.yml) workflow then:
 1. Builds the OSS channel bundle for macOS arm64 (`./script/bundle --channel oss --nouniversal`).
 2. Generates `THIRD_PARTY_LICENSES.txt` via `cargo-about` (bundled into the app and
    attached as a standalone asset).
-3. Packages `Tarp-macos-arm64.dmg`.
+3. Packages `Tarp-macos-arm64.dmg` (signed + notarized — see below).
 4. Creates a GitHub Release for the tag with auto-generated release notes and the
    artifacts attached.
+5. **Bumps the Homebrew cask** in `ramsrib/homebrew-tap` (so `brew upgrade --cask
+   tarp` picks up the new version) — see "Homebrew distribution" below.
+
+## Homebrew distribution
+
+Tarp is distributed through a personal tap, **[`ramsrib/homebrew-tap`](https://github.com/ramsrib/homebrew-tap)**
+(`Casks/tarp.rb`):
+
+```sh
+brew install --cask ramsrib/tap/tarp     # install
+brew upgrade --cask tarp                  # update
+```
+
+**Auto-bump:** the release workflow's `bump-cask` job updates the cask's `version`
++ `sha256` and pushes to the tap after each release. The cross-repo push needs a
+token the default `GITHUB_TOKEN` can't provide, so set one repo secret on
+`ramsrib/tarp`:
+
+- **`HOMEBREW_TAP_TOKEN`** — a fine-grained PAT scoped to `ramsrib/homebrew-tap`
+  with **Contents: Read and write**. (Without it, `bump-cask` skips and the release
+  still succeeds — bump the cask manually.)
+
+**Manual bump** (if the token isn't set): in `ramsrib/homebrew-tap`, set
+`version` to the new `X.Y.Z` and `sha256` to `shasum -a 256 Tarp-macos-arm64.dmg`
+of the new DMG in `Casks/tarp.rb`, then push.
+
+Graduating to the official `homebrew-cask` (`brew install --cask tarp`, no tap
+prefix) is a later step once Tarp has adoption — it requires a PR meeting their
+notability/maintenance bar.
 
 ### Dry run (no Release created)
 

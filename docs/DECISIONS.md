@@ -172,3 +172,66 @@ are configured and the workflow auto-uses them (falls back to a valid ad-hoc
 signature if absent — which shows the openable "Apple could not verify…" prompt,
 not "damaged"). A **preflight gate** (fmt + compile check) now also gates the build.
 Windows Authenticode remains TODO.
+
+## ADR-010 — macOS-native UX defaults + searchable session palette
+**Decision (2026-06-16):**
+- **Defaults:** monospace font `SF Mono` (was Hack), size `16` (was 14), cursor
+  `Block` (was Bar), cursor blink `off` (was on). (`app/src/settings/font.rs`,
+  `app/src/settings/editor.rs`.)
+- **Session palette:** search and display the user-set **tab title** and **tab
+  color**. The title is prepended to the searchable string so it dominates fuzzy
+  scoring; each row shows a color dot + `[title]` with matched chars bolded.
+  (`app/src/session_management.rs` + its construction chain +
+  `app/src/search/command_palette/navigation/{search,render}.rs`.)
+
+**Why:**
+- The defaults match common macOS terminal prefs (and the maintainer's Ghostty
+  config); we ship **macOS-only** (ADR-009), so `SF Mono` is a reasonable default.
+  It isn't bundled and isn't guaranteed installed, but font loading falls back to
+  the embedded **Hack** when it's missing (`app/src/appearance.rs`) — worst case is
+  "SF Mono if present, else Hack", never a crash or blank glyph. `copy_on_select`
+  and confirm-on-quit already matched, so they were left alone.
+- The session palette was effectively useless for the maintainer's workflow: every
+  row rendered the same prompt + command, and the custom title — the one thing that
+  distinguishes sessions — was neither searched nor shown. Prompt matches are noise
+  when every session shares the prompt, hence **title-dominant** scoring.
+
+**Consequences:** defaults apply to new installs and to existing users who never
+overrode them (persisted `~/.tarp` values still win). Note the font is a **global**
+appearance setting, theme-independent — there is no per-theme font.
+
+## ADR-011 — Re-enable the CLI-agent rich-input composer (Ctrl-G); footer/chips stay off
+**Decision (2026-06-16):** Allow **Ctrl-G** to open a multi-line **rich-input
+composer** for a detected CLI coding agent (Claude Code, codex, gemini, …) while
+keeping the standalone agent footer and toolbar chips **off** by default. Three
+coordinated changes:
+1. Add `cli_agent_rich_input` to the **`default`** cargo-feature set so
+   `FeatureFlag::CLIAgentRichInput` is enabled — the open handler
+   (`app/src/terminal/view/use_agent_footer/mod.rs`) bails otherwise. The
+   rich-input *code* is always compiled; only the flag registration was gated.
+2. Re-gate the Ctrl-G binding (`app/src/terminal/view/init.rs`) on an **active
+   agent session** (`CLI_AGENT_SESSION_ACTIVE_KEY`, set whenever an agent command
+   is detected) instead of the footer/chip context flags. So Ctrl-G opens the
+   composer only when an agent runs in a long-running/alt-screen state, and still
+   passes through as **BEL** for non-agent TUIs (vim/htop/less) and at a bare prompt.
+3. Render the composer **chrome-free** (`app/src/terminal/input/cli_agent.rs`):
+   drop the bottom toolbar (brand icon, file explorer, settings, attach, context
+   chips). Close with Ctrl-G or Escape.
+
+**Why:** the maintainer drives Claude Code from inside Tarp; a clean composer for
+multi-line prompts is genuinely useful, but the full agent footer/toolbar is exactly
+the "AI surface" Tarp strips. Gating on the agent-session context (not the footer
+settings) yields the composer without the chrome, and without swallowing Ctrl-G
+everywhere. Agent **detection** is upstream and not flag-gated — `"claude"` and the
+other agent commands are in the built-in list (`app/src/terminal/cli_agent.rs`).
+
+**Relationship to ADR-005 / ADR-007:** a **narrow, deliberate** re-opening of one
+slice of the agent surface those ADRs disabled — scoped to a single keybinding +
+composer, with the footer/chips and all other agent UI still off. Not a reversal of
+the no-AI/no-cloud stance.
+
+**Consequences:** enabling the flag also surfaces a couple of rich-input config rows
+in the AI settings page (`app/src/settings_view/ai_page.rs`) — harmless. The A8
+feature-flags spec lists `cli_agent_rich_input` under "REMOVE — AI/agents"; that
+categorization is now superseded for the `default` set (noted in
+[`removal/feature-flags.md`](removal/feature-flags.md)).

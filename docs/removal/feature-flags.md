@@ -240,6 +240,12 @@ terminal justification.
 `gpt_configurable_context_window`, `integration_command`, `artifact_command`,
 `fork_from_command`, `agent_mode_evals`.
 
+> **Update (2026-06-16, ADR-011):** `cli_agent_rich_input` was later
+> **re-enabled** and added to the `default` set — it powers the **Ctrl-G**
+> rich-input composer for detected CLI coding agents (Claude Code, codex, …), while
+> the agent footer/chips stay off. It is therefore an **exception** to the 3b REMOVE
+> categorization above. See [`../DECISIONS.md`](../DECISIONS.md) ADR-011.
+
 > Note: `voice_input` (REMOVE; pulls `dep:voice_input`) and the whole
 > `crates/ai`, `computer_use`, `mcp` trees are crate-level deletions covered by
 > `docs/05-removal-map.md` Tier A; here we just stop enabling their features.

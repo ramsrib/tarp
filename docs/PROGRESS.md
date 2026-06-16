@@ -6,6 +6,45 @@ Companion to [`../TARP-PLAN.md`](../TARP-PLAN.md) (the plan) and
 
 ---
 
+## 2026-06-16
+
+### Session-palette search, macOS-native UX defaults, Ctrl-G agent composer  ✅
+Three Tarp-owned changes (`app/src` + `app/Cargo.toml`), pushed to `main`. Rationale
+in [`DECISIONS.md`](DECISIONS.md) ADR-010 / ADR-011.
+
+- **Session palette searches & shows the tab title + color** (`04cdda4c`). The
+  palette built its searchable string from prompt + command + hint only, so custom
+  tab titles weren't matchable and every row rendered identically (`vapi-ops
+  git:(main)` / `clwd Running…`). Threaded the pane group's custom title and the
+  tab's resolved color into `SessionNavigationData`, **prepended** the title to the
+  searchable string so it dominates fuzzy scoring (prompt/command text is usually
+  identical across sessions), and render each row with a color dot + `[title]`
+  (matched chars bolded). Untitled/uncolored rows unchanged. Touches
+  `session_management.rs`, `pane_group/mod.rs`, `workspace/view.rs`,
+  `terminal_pane.rs`, `quit_warning/mod.rs`,
+  `search/command_palette/navigation/{search,render}.rs`.
+
+- **macOS-native defaults** (`b24ba96e`): monospace font **Hack→SF Mono**, size
+  **14→16**, cursor **Bar→Block**, blink **on→off** (`settings/font.rs`,
+  `settings/editor.rs`). SF Mono is macOS-only and not bundled, but font loading
+  falls back to the embedded **Hack** if it's absent (`appearance.rs`), so the worst
+  case is "SF Mono if installed, else Hack" — safe for the macOS-only build.
+  `copy_on_select` and confirm-on-quit already matched common prefs, left as-is.
+  Defaults only — existing `~/.tarp` profiles keep persisted values.
+
+- **Ctrl-G opens a rich-input composer for detected CLI agents** (`2606c207`). Pops
+  a multi-line composer for a running CLI coding agent (Claude Code, codex,
+  gemini, …) without enabling the agent footer/toolbar chips. Enabled
+  `cli_agent_rich_input` in the `default` feature set (the open handler is gated on
+  `FeatureFlag::CLIAgentRichInput`); re-gated the Ctrl-G binding on an **active agent
+  session** (`CLI_AGENT_SESSION_ACTIVE_KEY`) instead of the footer/chip context
+  flags, so it fires only when an agent is detected in a long-running/alt-screen
+  state and still passes through (BEL) for vim/htop/less and at a bare prompt;
+  rendered the composer **chrome-free** (no toolbar — brand icon/file-explorer/
+  settings/attach/chips dropped; close with Ctrl-G or Escape). A narrow, deliberate
+  re-opening of a slice of the agent surface ADR-005/007 disabled — see ADR-011.
+  Touches `app/Cargo.toml`, `terminal/view/init.rs`, `terminal/input/cli_agent.rs`.
+
 ## 2026-06-07
 
 ### v0.1.0 — signed + notarized, plus UX defaults  ✅

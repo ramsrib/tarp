@@ -79,6 +79,13 @@ entails. Newest concerns first. See [`DECISIONS.md`](DECISIONS.md) for rationale
   surfaces are deleted.
 - **`paths_tests.rs` etc.** assertions still reference `.warp-oss` after the config
   dir rename — update (not run by `cargo build`).
+- **Settings/shortcuts residual cleanup.** First pass done (2026-06-16: shared-session
+  row, quit/logout label, `@` menu, three Ask-AI keybindings). Remaining: the broader
+  **keyboard-shortcuts list** still lists dead/duplicate actions ("Add Repository",
+  two identical "Close (⌘W)" rows, etc.) — an action-registry pass. Also decide on the
+  agent-adjacent rows left intentionally (agent font, agent-session tab titles, default
+  session mode) and the ambiguous cmd-enter "Accept Prompt Suggestion" binding now that
+  ADR-011 keeps the Ctrl-G CLI-agent composer.
 
 ## Open product decisions (low priority)
 

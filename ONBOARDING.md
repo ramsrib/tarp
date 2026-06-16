@@ -27,9 +27,14 @@ no telemetry**.
   Developer ID); downloads open with just the standard "Open" dialog. Smoke-tested
   end-to-end. Slim `ci.yml` (rustfmt + Linux build) green.
 - **Default look/UX:** **Rainfly** theme (dark + light, olive-green accent/cursor,
-  no Warp bg image), themed text selection, shell **PS1** prompt by default, 14px
-  font, no per-block timer, agent footers off. (Themes/inputs are defaults — see
-  PROGRESS / DECISIONS.)
+  no Warp bg image), themed text selection, shell **PS1** prompt by default,
+  **SF Mono 16** (falls back to bundled Hack), **block cursor, no blink**, no
+  per-block timer, agent footers off, `@`-context-menu off (ADR-010). Searchable
+  session palette (tab title + color). (Defaults — existing `~/.tarp` keeps overrides.)
+- **One narrow agent affordance (ADR-011):** **Ctrl-G** opens a chrome-free
+  rich-input composer for a detected CLI agent (Claude Code / codex / gemini …);
+  no agent footer/chips. Dead in-app-AI surfaces (Ask-AI keybindings, `@` menu,
+  shared-session/code-review settings) stripped.
 - **Builds, bundles, launches** as `Tarp.app` (OSS channel). Identity is fully Tarp:
   `dev.tarp.Tarp`, binary `tarp`, `Tarp.app`, `TERM_PROGRAM=TarpTerminal`,
   config `~/.tarp`, log `tarp.log`, custom icon.

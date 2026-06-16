@@ -8,6 +8,22 @@ Companion to [`../TARP-PLAN.md`](../TARP-PLAN.md) (the plan) and
 
 ## 2026-06-16
 
+### Settings cleanup — strip dead cloud/in-app-AI rows  ✅
+From a review of the three settings tabs (Appearance/Features/Keyboard shortcuts).
+Removed only the clearly-dead surfaces; left agent-adjacent ones that may serve the
+Ctrl-G CLI-agent workflow (ADR-011). Pushed to `main` (`e9db7ae4`, `0140166d`).
+- **Cloud/account:** hid "Confirm before closing shared session" (session sharing =
+  cloud); renamed "Show warning before quitting/logging out" → "…before quitting"
+  (no accounts). (`settings_view/features_page.rs`)
+- **In-app AI:** `@` context menu in terminal mode defaulted **off** + toggle hidden
+  (`settings/input.rs`, `features_page.rs`); removed the three "Ask Tarp AI"
+  keybindings from the shortcuts list (`terminal/view/init.rs`) — all gated on
+  `IS_ANY_AI_ENABLED`, dead in Tarp.
+- **Left (gray / ambiguous):** agent font, agent-session tab titles, default session
+  mode (may serve the Ctrl-G composer); "Accept Prompt Suggestion" (cmd-enter,
+  ambiguous); broader shortcuts-list oddities ("Add Repository", duplicate "Close"
+  rows) → a later action-registry pass. See BACKLOG.
+
 ### Session-palette search, macOS-native UX defaults, Ctrl-G agent composer  ✅
 Three Tarp-owned changes (`app/src` + `app/Cargo.toml`), pushed to `main`. Rationale
 in [`DECISIONS.md`](DECISIONS.md) ADR-010 / ADR-011.

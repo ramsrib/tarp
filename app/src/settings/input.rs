@@ -115,7 +115,9 @@ define_settings_group!(InputSettings,
         },
         at_context_menu_in_terminal_mode: AtContextMenuInTerminalMode {
             type: bool,
-            default: true,
+            // Tarp: the '@' menu is the in-app AI context menu (feeds Warp's agent);
+            // off by default (CLI agents get their own context via the Ctrl-G composer).
+            default: false,
             supported_platforms: SupportedPlatforms::ALL,
             sync_to_cloud: SyncToCloud::Globally(RespectUserSyncSetting::Yes),
             private: false,

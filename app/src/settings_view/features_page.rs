@@ -592,21 +592,25 @@ pub fn init_actions_from_parent_view<T: Action + Clone>(
         )
         .with_enabled(|| FeatureFlag::AgentView.is_enabled()),
     );
-    toggle_binding_pairs.push(
-        ToggleSettingActionPair::new(
-            "'@' context menu in terminal mode",
-            builder(SettingsAction::FeaturesPageToggle(
-                FeaturesPageAction::ToggleAtContextMenuInTerminalMode,
-            )),
-            context,
-            flags::AT_CONTEXT_MENU_IN_TERMINAL_FLAG,
-        )
-        .is_supported_on_current_platform(
-            InputSettings::as_ref(app)
-                .at_context_menu_in_terminal_mode
-                .is_supported_on_current_platform(),
-        ),
-    );
+    // Tarp: the '@' context menu is the in-app AI context menu (dead — CLI agents
+    // use the Ctrl-G composer for context). Hidden + defaulted off.
+    if false {
+        toggle_binding_pairs.push(
+            ToggleSettingActionPair::new(
+                "'@' context menu in terminal mode",
+                builder(SettingsAction::FeaturesPageToggle(
+                    FeaturesPageAction::ToggleAtContextMenuInTerminalMode,
+                )),
+                context,
+                flags::AT_CONTEXT_MENU_IN_TERMINAL_FLAG,
+            )
+            .is_supported_on_current_platform(
+                InputSettings::as_ref(app)
+                    .at_context_menu_in_terminal_mode
+                    .is_supported_on_current_platform(),
+            ),
+        );
+    }
 
     toggle_binding_pairs.push(ToggleSettingActionPair::new(
         "preserve input focus on block selection",

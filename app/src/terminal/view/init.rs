@@ -813,49 +813,11 @@ pub fn init(app: &mut AppContext) {
                 & (id!("ActiveBlockTextSelection") | id!("ActiveAltScreenSelection"))
                 & id!(flags::IS_ANY_AI_ENABLED),
         ),
-        // We register a single binding for either a selected block or selected text
-        // to avoid cluttering the keybindings UI. At the end of the day, these
-        // map to the same logic, and we should be able to distinguish whether
-        // this is a block selection or text selection later on.
-        EditableBinding::new(
-            "terminal:ask_ai_assistant",
-            "Ask Tarp AI about Selection",
-            TerminalAction::ContextMenu(ContextMenuAction::AskAI(AskAISource::SelectedBlockOrText)),
-        )
-        .with_enabled(|| !FeatureFlag::AgentMode.is_enabled())
-        .with_custom_action(CustomAction::AttachSelectionAsAgentModeContext)
-        .with_group(bindings::BindingGroup::WarpAi.as_str())
-        .with_context_predicate(
-            id!("Terminal")
-                & id!(flags::IS_ANY_AI_ENABLED)
-                & (eq!("TerminalView_BlockSelectionCardinality", "One")
-                    | id!("ActiveBlockTextSelection")
-                    | id!("ActiveAltScreenSelection")),
-        ),
+        // Tarp: removed the in-app "Ask Tarp AI about Selection" keybinding.
     ]);
 
-    app.register_editable_bindings([
-        EditableBinding::new(
-            "terminal:ask_ai_assistant_last_block",
-            "Ask Tarp AI about last block",
-            TerminalAction::ContextMenu(ContextMenuAction::AskAI(AskAISource::LastBlock)),
-        )
-        .with_enabled(|| !FeatureFlag::AgentMode.is_enabled())
-        .with_key_binding("ctrl-shift->")
-        .with_group(bindings::BindingGroup::WarpAi.as_str())
-        .with_context_predicate(
-            id!("Terminal") & id!("TerminalView_NonEmptyBlockList") & id!(flags::IS_ANY_AI_ENABLED),
-        ),
-        EditableBinding::new(
-            "terminal:ask_ai_assistant",
-            "Ask Tarp AI",
-            TerminalAction::ContextMenu(ContextMenuAction::AskAI(AskAISource::SelectedInputText)),
-        )
-        .with_enabled(|| !FeatureFlag::AgentMode.is_enabled())
-        .with_group(bindings::BindingGroup::WarpAi.as_str())
-        .with_key_binding("ctrl-shift-space")
-        .with_context_predicate(id!("Input") & id!(flags::IS_ANY_AI_ENABLED)),
-    ]);
+    // Tarp: removed the in-app "Ask Tarp AI" / "Ask Tarp AI about last block"
+    // keybindings (no in-app AI assistant; CLI agents use the Ctrl-G composer).
 
     if FeatureFlag::CommandCorrectionKey.is_enabled() {
         app.register_editable_bindings([EditableBinding::new(

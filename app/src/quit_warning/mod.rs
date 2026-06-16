@@ -74,7 +74,15 @@ impl QuitScope<'_> {
                 window_id,
             } => pane_group
                 .downcast_pane_by_id::<TerminalPane>(*pane_id)
-                .map(|pane| pane.session_navigation_data(*pane_group_id, *window_id, ctx))
+                .map(|pane| {
+                    pane.session_navigation_data(
+                        *pane_group_id,
+                        *window_id,
+                        pane_group.custom_title(ctx),
+                        None,
+                        ctx,
+                    )
+                })
                 .into_iter()
                 .collect_vec(),
             Self::Tabs(ref tabs) => {
@@ -87,6 +95,7 @@ impl QuitScope<'_> {
                         pane_group.as_ref(ctx).pane_sessions(
                             pane_group.id(),
                             pane_group.window_id(ctx),
+                            None,
                             ctx,
                         )
                     })

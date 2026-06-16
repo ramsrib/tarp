@@ -46,6 +46,7 @@ impl SessionMatchResult {
             highlight_indices: SessionHighlightIndices {
                 command_indices: None,
                 hint_text_indices: vec![],
+                title_indices: None,
             },
         }
     }
@@ -56,6 +57,7 @@ impl SessionMatchResult {
 pub struct SessionHighlightIndices {
     pub(super) command_indices: Option<Vec<usize>>,
     pub(super) hint_text_indices: Vec<usize>,
+    pub(super) title_indices: Option<Vec<usize>>,
 }
 
 impl SessionHighlightIndices {
@@ -81,9 +83,19 @@ impl SessionHighlightIndices {
             .map(|idx| *idx - session_highlights.hint_text_range.start)
             .collect::<Vec<usize>>();
 
+        #[allow(clippy::unnecessary_lazy_evaluations)]
+        let title_indices = session_highlights.title_range.map(|title_range| {
+            matched_indices
+                .iter()
+                .filter(|&idx| title_range.contains(idx))
+                .map(|idx| *idx - title_range.start)
+                .collect::<Vec<usize>>()
+        });
+
         SessionHighlightIndices {
             command_indices,
             hint_text_indices,
+            title_indices,
         }
     }
 }
@@ -124,13 +136,30 @@ where
         })
 }
 
-/// The searchable string format is: [prompt] [command] [hint text],
-/// where [command] may or may not be present.
+/// The searchable string format is: [tab title] [prompt] [command] [hint text],
+/// where [tab title] and [command] may or may not be present.
 fn searchable_session_string_and_ranges(
     session: &SessionNavigationData,
 ) -> (String, SearchableSessionStringRanges) {
-    let mut searchable_string = session.prompt().to_string();
-    let prompt_end = session.prompt().chars().count();
+    let mut searchable_string = String::new();
+
+    // Prepend the user-set tab title (if any) so it dominates fuzzy scoring: the
+    // prompt/command text is frequently identical across sessions, so the title
+    // is the most useful thing to match on.
+    let title_range = session
+        .tab_title()
+        .filter(|title| !title.is_empty())
+        .map(|title| {
+            let start = searchable_string.chars().count();
+            searchable_string.push_str(title);
+            let end = start + title.chars().count();
+            searchable_string.push(' ');
+            start..end
+        });
+
+    let prompt_start = searchable_string.chars().count();
+    searchable_string.push_str(session.prompt());
+    let prompt_end = prompt_start + session.prompt().chars().count();
 
     let command_range = match session.command_context() {
         CommandContext::LastRunCommand {
@@ -187,6 +216,7 @@ fn searchable_session_string_and_ranges(
         SearchableSessionStringRanges {
             command_range,
             hint_text_range,
+            title_range,
         },
     )
 }
@@ -194,6 +224,7 @@ fn searchable_session_string_and_ranges(
 struct SearchableSessionStringRanges {
     command_range: Option<Range<usize>>,
     hint_text_range: Range<usize>,
+    title_range: Option<Range<usize>>,
 }
 
 type SearcherAction = <DataSource as SyncDataSource>::Action;

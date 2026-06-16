@@ -5036,9 +5036,10 @@ impl Workspace {
         self.tabs.iter().flat_map(move |tab| {
             // Each tab has a pane group
             let pane_group_id = tab.pane_group.id();
+            let tab_color = tab.color();
             let view = tab.pane_group.as_ref(app);
 
-            view.pane_sessions(pane_group_id, window_id, app)
+            view.pane_sessions(pane_group_id, window_id, tab_color, app)
         })
     }
 

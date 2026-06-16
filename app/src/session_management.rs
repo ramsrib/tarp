@@ -1,6 +1,7 @@
 use std::collections::HashSet;
 
 use chrono::NaiveDateTime;
+use warp_core::ui::theme::AnsiColorIdentifier;
 use warpui::{AppContext, Entity, EntityId, WindowId};
 
 use crate::context_chips::prompt_snapshot::PromptSnapshot;
@@ -28,6 +29,10 @@ pub struct SessionNavigationData {
     is_read_only: bool,
     /// The sharing status of the session.
     shared_session_status: SharedSessionStatus,
+    /// The user-set custom tab title for the owning pane group, if any.
+    tab_title: Option<String>,
+    /// The resolved tab color (manual selection or directory default), if any.
+    tab_color: Option<AnsiColorIdentifier>,
 }
 
 impl SessionNavigationData {
@@ -100,6 +105,8 @@ impl SessionNavigationData {
         is_read_only: bool,
         window_id: WindowId,
         shared_session_status: SharedSessionStatus,
+        tab_title: Option<String>,
+        tab_color: Option<AnsiColorIdentifier>,
     ) -> Self {
         SessionNavigationData {
             prompt,
@@ -110,6 +117,8 @@ impl SessionNavigationData {
             is_read_only,
             window_id,
             shared_session_status,
+            tab_title,
+            tab_color,
         }
     }
 
@@ -143,6 +152,16 @@ impl SessionNavigationData {
 
     pub fn shared_session_status(&self) -> SharedSessionStatus {
         self.shared_session_status.clone()
+    }
+
+    /// The user-set custom tab title for the owning pane group, if any.
+    pub fn tab_title(&self) -> Option<&str> {
+        self.tab_title.as_deref()
+    }
+
+    /// The resolved tab color (manual selection or directory default), if any.
+    pub fn tab_color(&self) -> Option<AnsiColorIdentifier> {
+        self.tab_color
     }
 
     /// Fetches all sessions currently open in the app.

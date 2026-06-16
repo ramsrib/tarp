@@ -25,6 +25,7 @@ use uuid::Uuid;
 use warp_cli::agent::Harness;
 use warp_core::command::ExitCode;
 use warp_core::context_flag::ContextFlag;
+use warp_core::ui::theme::AnsiColorIdentifier;
 use warp_terminal::shell::{ShellName, ShellType};
 use warp_util::path::convert_wsl_to_windows_host_path;
 #[cfg(feature = "local_fs")]
@@ -2447,14 +2448,26 @@ impl PaneGroup {
     }
 
     /// Iterate over the terminal sessions in this pane group.
+    ///
+    /// `tab_color` comes from the owning [`TabData`] (which is not reachable from
+    /// the pane group itself), while the custom title lives on this pane group.
     pub fn pane_sessions<'a>(
         &'a self,
         pane_group_id: EntityId,
         window_id: WindowId,
+        tab_color: Option<AnsiColorIdentifier>,
         app: &'a AppContext,
     ) -> impl Iterator<Item = SessionNavigationData> + 'a {
-        self.panes_of::<TerminalPane>()
-            .map(move |pane| pane.session_navigation_data(pane_group_id, window_id, app))
+        let tab_title = self.custom_title(app);
+        self.panes_of::<TerminalPane>().map(move |pane| {
+            pane.session_navigation_data(
+                pane_group_id,
+                window_id,
+                tab_title.clone(),
+                tab_color,
+                app,
+            )
+        })
     }
 
     /// Send prompt change bindkey events to all terminal sessions in this pane group. This

@@ -109,6 +109,7 @@ fn highlight_indices_correct_after_byte_to_char_conversion() {
     let ranges = SearchableSessionStringRanges {
         command_range,
         hint_text_range,
+        title_range: None,
     };
     let highlights = SessionHighlightIndices::new(char_indices, ranges);
 
@@ -146,6 +147,7 @@ fn raw_byte_indices_produce_wrong_highlights() {
     let ranges = SearchableSessionStringRanges {
         command_range,
         hint_text_range,
+        title_range: None,
     };
     let highlights = SessionHighlightIndices::new(vec![byte_of_l, byte_of_s], ranges);
 

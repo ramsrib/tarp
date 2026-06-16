@@ -1,4 +1,5 @@
 use pathfinder_geometry::vector::vec2f;
+use warp_core::ui::theme::AnsiColorIdentifier;
 use warpui::elements::{
     Align, Border, ConstrainedBox, Container, CornerRadius, CrossAxisAlignment, Flex, Highlight,
     ParentElement, Radius, Shrinkable, Wrap,
@@ -26,6 +27,7 @@ use crate::terminal::model::blockgrid::BlockGrid;
 use crate::terminal::model::grid::Dimensions;
 use crate::terminal::safe_mode_settings::get_secret_obfuscation_mode;
 use crate::terminal::SizeInfo;
+use crate::ui_components::icons::Icon;
 
 /// Renders a navigation session.
 pub fn render_navigation_session(
@@ -83,8 +85,43 @@ fn render_session_label(
         appearance,
     );
 
+    // Prefix the prompt with the tab's color dot and custom title (when set) so
+    // sessions are visually distinguishable and the matched title is highlighted.
+    let color_dot = session
+        .tab_color()
+        .map(|color| render_tab_color_dot(color, appearance));
+    let title = session
+        .tab_title()
+        .filter(|title| !title.is_empty())
+        .map(|title| {
+            render_tab_title(
+                title,
+                highlight_indices.title_indices.clone(),
+                item_highlight_state,
+                appearance,
+            )
+        });
+
+    let prompt_row: Box<dyn Element> = if color_dot.is_some() || title.is_some() {
+        let mut row = Flex::row().with_cross_axis_alignment(CrossAxisAlignment::Center);
+        if let Some(color_dot) = color_dot {
+            row.add_child(
+                Container::new(color_dot)
+                    .with_margin_right(styles::NAVIGATION_PALETTE_ROW_HORIZONTAL_SPACING)
+                    .finish(),
+            );
+        }
+        if let Some(title) = title {
+            row.add_child(title);
+        }
+        row.add_child(prompt);
+        row.finish()
+    } else {
+        prompt
+    };
+
     navigation_palette_item.add_child(
-        Container::new(prompt)
+        Container::new(prompt_row)
             .with_margin_right(styles::NAVIGATION_PALETTE_ROW_HORIZONTAL_SPACING)
             .finish(),
     );
@@ -97,6 +134,53 @@ fn render_session_label(
     );
 
     navigation_palette_item
+}
+
+/// Size of the tab color dot rendered before the prompt.
+const TAB_COLOR_DOT_SIZE: f32 = 9.;
+
+/// Renders a small filled dot in the tab's resolved color, mirroring the color
+/// used in the tab bar (`AnsiColorIdentifier` resolved against the theme).
+fn render_tab_color_dot(color: AnsiColorIdentifier, appearance: &Appearance) -> Box<dyn Element> {
+    let theme = appearance.theme();
+    let fill = color.to_ansi_color(&theme.terminal_colors().normal).into();
+    ConstrainedBox::new(Icon::Ellipse.to_warpui_icon(fill).finish())
+        .with_width(TAB_COLOR_DOT_SIZE)
+        .with_height(TAB_COLOR_DOT_SIZE)
+        .finish()
+}
+
+/// Renders the user-set custom tab title (in `[brackets]`), bolding the
+/// characters that matched the search query.
+fn render_tab_title(
+    title: &str,
+    title_indices: Option<Vec<usize>>,
+    item_highlight_state: ItemHighlightState,
+    appearance: &Appearance,
+) -> Box<dyn Element> {
+    let color = item_highlight_state.main_text_fill(appearance).into_solid();
+    let mut title_span = appearance
+        .ui_builder()
+        .span(format!("[{title}]"))
+        .with_style(UiComponentStyles {
+            font_family_id: Some(appearance.monospace_font_family()),
+            font_size: Some(appearance.monospace_font_size() - 2.),
+            font_color: Some(color),
+            ..Default::default()
+        });
+
+    if let Some(title_indices) = title_indices {
+        // Offset by 1 to account for the leading '[' in the rendered label.
+        let title_indices: Vec<usize> = title_indices.into_iter().map(|idx| idx + 1).collect();
+        let highlight = Highlight::new()
+            .with_properties(Properties::default().weight(Weight::Bold))
+            .with_foreground_color(color);
+        title_span = title_span.with_highlights(title_indices, highlight);
+    }
+
+    Container::new(title_span.build().finish())
+        .with_margin_right(styles::NAVIGATION_PALETTE_ROW_HORIZONTAL_SPACING)
+        .finish()
 }
 
 fn render_current_session_pill(

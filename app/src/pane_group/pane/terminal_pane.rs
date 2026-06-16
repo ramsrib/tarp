@@ -10,6 +10,7 @@ use session_sharing_protocol::sharer::SessionSourceType;
 use url::Url;
 use warp_cli::agent::Harness;
 use warp_core::execution_mode::AppExecutionMode;
+use warp_core::ui::theme::AnsiColorIdentifier;
 use warp_multi_agent_api as multi_agent_api;
 use warpui::{
     AppContext, EntityId, ModelHandle, SingletonEntity, ViewContext, ViewHandle, WindowId,
@@ -258,10 +259,13 @@ impl TerminalPane {
         }
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub fn session_navigation_data(
         &self,
         pane_group_id: EntityId,
         window_id: WindowId,
+        tab_title: Option<String>,
+        tab_color: Option<AnsiColorIdentifier>,
         app: &AppContext,
     ) -> SessionNavigationData {
         let view = self.terminal_view(app).as_ref(app);
@@ -277,6 +281,8 @@ impl TerminalPane {
             view.is_read_only(),
             window_id,
             view.model.lock().shared_session_status().clone(),
+            tab_title,
+            tab_color,
         )
     }
 

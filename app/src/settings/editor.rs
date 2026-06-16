@@ -181,7 +181,7 @@ impl WarpPromptSeparator {
 define_settings_group!(AppEditorSettings, settings: [
     cursor_blink: CursorBlinkEnabled {
         type: CursorBlink,
-        default: CursorBlink::default(),
+        default: CursorBlink::Disabled,
         supported_platforms: SupportedPlatforms::ALL,
         sync_to_cloud: SyncToCloud::Globally(RespectUserSyncSetting::Yes),
         private: false,
@@ -191,7 +191,7 @@ define_settings_group!(AppEditorSettings, settings: [
     },
     cursor_display_type: CursorDisplayState {
         type: CursorDisplayType,
-        default: CursorDisplayType::default(),
+        default: CursorDisplayType::Block,
         supported_platforms: SupportedPlatforms::ALL,
         sync_to_cloud: SyncToCloud::Globally(RespectUserSyncSetting::Yes),
         private: false,

@@ -551,6 +551,12 @@ default = [
     "autoupdate",
     "changelog",
     "pluggable_notifications",
+
+    # --- CLI coding agents (local) ---
+    # Enables the Ctrl-G rich-input composer for detected CLI agents (Claude
+    # Code, codex, gemini, ...). The agent footer/chip stay off by default
+    # (separate settings), so this only adds the Ctrl-G composer surface.
+    "cli_agent_rich_input",
 ]
 # Enable this feature to automatically perform heap profiling.  NOTE: This will
 # substantially slow down program execution.

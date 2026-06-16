@@ -319,12 +319,16 @@ pub fn init(app: &mut AppContext) {
         )
         .with_key_binding("ctrl-g")
         .with_context_predicate(
-            // Case 1: Open from terminal during CLI agent session
+            // Case 1: Open from terminal during a CLI agent session. Gated on an
+            // active agent session (set whenever a CLI agent like Claude Code is
+            // detected) rather than the footer/chip being visible, so Ctrl-G
+            // opens the rich input even with those UI surfaces disabled. The
+            // session gate also keeps Ctrl-G passing through (as BEL) for
+            // non-agent alt-screen TUIs like vim/htop and at the bare prompt.
             (id!("Terminal")
                 & !id!("IMEOpen")
                 & (id!("LongRunningCommand") | id!("AltScreen"))
-                & id!(flags::CLI_AGENT_FOOTER_ENABLED)
-                & id!(flags::CLI_AGENT_RICH_INPUT_CHIP_ENABLED))
+                & id!(CLI_AGENT_SESSION_ACTIVE_KEY))
             // Case 2: Close from focused editor when rich input is open
             | (id!("EditorView") & !id!("IMEOpen") & id!(flags::CLI_AGENT_RICH_INPUT_OPEN))
             // Case 3: Close from terminal context when rich input is open (covers

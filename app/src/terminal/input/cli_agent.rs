@@ -74,15 +74,10 @@ impl Input {
         }
 
         column.add_child(editor_element);
-        column.add_child(
-            SavePosition::new(
-                Container::new(ChildView::new(&self.agent_input_footer).finish())
-                    .with_padding_right(*TERMINAL_VIEW_PADDING_LEFT)
-                    .finish(),
-                &self.prompt_save_position_id(),
-            )
-            .finish(),
-        );
+        // Tarp: the Ctrl-G rich-input composer is intentionally chrome-free — no
+        // bottom toolbar (brand icon / file explorer / settings / attach / chips).
+        // It's just the editor; close it with Ctrl-G or Escape. The standalone CLI
+        // agent footer is rendered via a separate path and is unaffected.
 
         stack.add_child(wrap_input_with_terminal_padding_and_focus_handler(
             self.is_active_session(app),

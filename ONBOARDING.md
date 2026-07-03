@@ -6,7 +6,7 @@ stripped to a plain, modern, privacy-first terminal: **no AI, no cloud, no accou
 no telemetry**.
 
 - Repo: `https://github.com/ramsrib/tarp` · default branch **`main`** · platform macOS (Apple Silicon).
-- Local path: `/Users/sriram/Projects/scratch/tarp`.
+- Local path: `/Users/sriram/Projects/active/tarp`.
 
 ## Start here — the doc set (`docs/`)
 | Doc | Why |

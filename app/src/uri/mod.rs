@@ -16,7 +16,9 @@ use url::Url;
 use warp_util::path::LineAndColumnArg;
 use warpui::notification::UserNotification;
 use warpui::platform::TerminationMode;
-use warpui::{AppContext, EntityId, SingletonEntity as _, TypedActionView, ViewHandle, WindowId};
+use warpui::{
+    AppContext, EntityId, ModelHandle, SingletonEntity as _, TypedActionView, ViewHandle, WindowId,
+};
 
 use self::docker::open_docker_container;
 use crate::ai::active_agent_views_model::{ActiveAgentViewsModel, ConversationOrTaskId};
@@ -877,6 +879,9 @@ enum Action {
         repos: Vec<String>,
     },
     FocusCloudMode,
+    FocusTab {
+        tty: Option<String>,
+    },
     AutoHandoffToCloud {
         trigger: AutoCloudHandoffTrigger,
     },
@@ -905,6 +910,11 @@ impl Action {
                 Ok(Self::CreateEnvironment { repos })
             }
             "/focus_cloud_mode" => Ok(Self::FocusCloudMode),
+            "/focus_tab" => Ok(Self::FocusTab {
+                tty: url
+                    .query_pairs()
+                    .find_map(|(k, v)| (k == "tty").then(|| v.into_owned())),
+            }),
             "/auto_handoff_to_cloud" | "/auto-handoff-to-cloud" => Ok(Self::AutoHandoffToCloud {
                 trigger: parse_auto_handoff_trigger(url),
             }),
@@ -1124,6 +1134,33 @@ impl Action {
                     ctx,
                 );
             }
+            Action::FocusTab { tty } => {
+                let terminal_view_id = tty
+                    .as_deref()
+                    .and_then(|tty| find_terminal_view_by_tty(tty, ctx));
+
+                let Some(terminal_view_id) = terminal_view_id else {
+                    log::warn!("focus_tab: no local session matches tty {tty:?}; ignoring");
+                    return;
+                };
+
+                let Some((window_id, workspace)) =
+                    find_workspace_for_terminal_view(terminal_view_id, ctx)
+                else {
+                    log::warn!(
+                        "focus_tab: session matching tty {tty:?} is not attached to a workspace; ignoring"
+                    );
+                    return;
+                };
+
+                ctx.windows().show_window_and_focus_app(window_id);
+                workspace.update(ctx, |workspace, ctx| {
+                    workspace.handle_action(
+                        &WorkspaceAction::FocusTerminalViewInWorkspace { terminal_view_id },
+                        ctx,
+                    );
+                });
+            }
             Action::AutoHandoffToCloud { trigger } => {
                 trigger_auto_handoff_to_cloud(*trigger, ctx);
             }
@@ -1148,7 +1185,10 @@ impl Action {
                 title: "New tab created".to_owned(),
                 description: "Go to Tarp to see your new tab.".to_owned(),
             }),
-            Self::NewWindow => W::Nothing,
+            // FocusTab raises the matched window itself; resolving the default
+            // hint here would activate (or create) a window before we know
+            // whether the tty matches anything.
+            Self::NewWindow | Self::FocusTab { .. } => W::Nothing,
         }
     }
 }
@@ -1451,6 +1491,28 @@ fn open_window_with_action(active_window_id: Option<WindowId>, action: &str, ctx
         // TODO: Note we cannot just dispatch here as it will be a no-op.
         // Need to send a callback once window is fully open.
     }
+}
+
+/// Finds the terminal view whose local PTY's follower end matches `tty`,
+/// given either as a bare device name ("ttys012", the `ps -o tty=` form) or
+/// as a full path ("/dev/ttys012").
+fn find_terminal_view_by_tty(tty: &str, ctx: &AppContext) -> Option<EntityId> {
+    let requested = tty.trim().trim_start_matches("/dev/");
+    if requested.is_empty() {
+        return None;
+    }
+
+    let managers: Vec<ModelHandle<Box<dyn crate::terminal::TerminalManager>>> =
+        ctx.models_of_type();
+    // The OS recycles tty device names, so a session that is mid-teardown can
+    // still cache the same name as a newer live session. Model ids ascend by
+    // creation order; iterate newest-first so the live session always wins.
+    managers.into_iter().rev().find_map(|manager| {
+        manager.read(ctx, |manager, _ctx| {
+            let tty_name = manager.tty_name()?;
+            (tty_name.trim_start_matches("/dev/") == requested).then(|| manager.view().id())
+        })
+    })
 }
 
 fn find_workspace_for_terminal_view(

@@ -1547,6 +1547,11 @@ impl TerminalModel {
         self.event_proxy.send_terminal_event(Event::Exit { reason });
     }
 
+    /// Whether the shell/event loop backing this session has already exited.
+    pub fn has_exited(&self) -> bool {
+        self.handled_exit
+    }
+
     pub fn is_read_only(&self) -> bool {
         self.handled_exit
             || self.is_conversation_transcript_viewer()

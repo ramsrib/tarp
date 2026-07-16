@@ -337,15 +337,30 @@ where
                 let mut can_read = false;
                 let mut can_write = false;
 
-                self.poll
+                // If either registration fails, shut the session down cleanly
+                // rather than panicking the thread: a panic here would leave
+                // the terminal model alive but permanently un-exited (and its
+                // cached tty name matchable) with no event loop behind it.
+                let registration = self
+                    .poll
                     .registry()
                     .register(&mut self.rx, CHANNEL_TOKEN, Interest::READABLE)
-                    .unwrap();
-
-                // Register TTY through EventedRW interface.
-                self.pty
-                    .register(&self.poll, Interest::READABLE | Interest::WRITABLE)
-                    .unwrap();
+                    .map_err(|err| format!("channel registration failed: {err:?}"))
+                    .and_then(|_| {
+                        // Register TTY through EventedRW interface.
+                        self.pty
+                            .register(&self.poll, Interest::READABLE | Interest::WRITABLE)
+                            .map_err(|err| format!("PTY registration failed: {err:?}"))
+                    });
+                if let Err(err) = registration {
+                    log::error!("Failed to start PTY event loop; shutting down session: {err}");
+                    self.terminal.lock().exit(ExitReason::PtyDisconnected);
+                    if let Err(err) = self.pty.kill() {
+                        log::error!("Failed to kill PTY process {err:?}");
+                    }
+                    self.event_listener.send_wakeup_event();
+                    return;
+                }
 
                 let mut events = Events::with_capacity(1024);
 
@@ -467,14 +482,18 @@ where
                 let _ = self.pty.deregister(&self.poll);
 
                 // Terminate the PTY process, if it's not the initiator of the shutdown.
+                // Notify the terminal model that the PTY process has exited.
+                // This must happen before killing the PTY: killing closes the
+                // leader fd, which lets the OS recycle the tty device name,
+                // and a session that isn't marked exited yet must not stay
+                // matchable by that name (see `TerminalManager::tty_name`).
+                self.terminal.lock().exit(ExitReason::PtyDisconnected);
                 if !child_exited {
                     let res = self.pty.kill();
                     if let Err(err) = res {
                         log::error!("Failed to kill PTY process {err:?}");
                     }
                 }
-                // Notify the terminal model that the PTY process has exited.
-                self.terminal.lock().exit(ExitReason::PtyDisconnected);
             })
             .expect("thread spawn works")
     }

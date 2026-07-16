@@ -305,6 +305,62 @@ fn test_action_focus_cloud_mode_parse() {
 }
 
 #[test]
+fn test_action_focus_tab_parse() {
+    let url = Url::parse(&format!(
+        "{}://action/focus_tab?tty=ttys012",
+        ChannelState::url_scheme()
+    ))
+    .unwrap();
+
+    let action = Action::parse(&url).unwrap();
+    match action {
+        Action::FocusTab { tty } => assert_eq!(tty.as_deref(), Some("ttys012")),
+        _ => panic!("unexpected action: {action:?}"),
+    }
+}
+
+#[test]
+fn test_action_focus_tab_parse_url_encoded_tty() {
+    let url = Url::parse(&format!(
+        "{}://action/focus_tab?tty=%2Fdev%2Fttys012",
+        ChannelState::url_scheme()
+    ))
+    .unwrap();
+
+    let action = Action::parse(&url).unwrap();
+    match action {
+        Action::FocusTab { tty } => assert_eq!(tty.as_deref(), Some("/dev/ttys012")),
+        _ => panic!("unexpected action: {action:?}"),
+    }
+}
+
+#[test]
+fn test_action_focus_tab_parse_missing_tty() {
+    let url = Url::parse(&format!(
+        "{}://action/focus_tab",
+        ChannelState::url_scheme()
+    ))
+    .unwrap();
+
+    let action = Action::parse(&url).unwrap();
+    match action {
+        Action::FocusTab { tty } => assert!(tty.is_none()),
+        _ => panic!("unexpected action: {action:?}"),
+    }
+}
+
+#[test]
+fn test_action_unknown_path_errors() {
+    let url = Url::parse(&format!(
+        "{}://action/definitely_not_an_action",
+        ChannelState::url_scheme()
+    ))
+    .unwrap();
+
+    assert!(Action::parse(&url).is_err());
+}
+
+#[test]
 fn test_action_create_environment_parse_no_repos() {
     let url = Url::parse(&format!(
         "{}://action/create_environment",

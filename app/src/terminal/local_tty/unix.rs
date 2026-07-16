@@ -61,6 +61,19 @@ fn make_pty(size: winsize) -> Result<(RawFd, RawFd)> {
     Ok((ends.master, ends.slave))
 }
 
+/// Get the device name of the follower end of the PTY whose leader end is
+/// `leader_fd` (e.g. "/dev/ttys012").
+pub(super) fn tty_name_for_leader_fd(leader_fd: RawFd) -> Option<String> {
+    // `ptsname` returns a pointer into static storage (or null on error), so
+    // it is not reentrant; we only call it from the main thread and copy the
+    // result out immediately.
+    let name = unsafe { libc::ptsname(leader_fd) };
+    if name.is_null() {
+        return None;
+    }
+    Some(unsafe { CStr::from_ptr(name) }.to_string_lossy().into_owned())
+}
+
 fn docker_sandbox_run_args(starter: &DockerSandboxShellStarter) -> Vec<std::ffi::OsString> {
     let init_dir = starter.init_dir();
     let init_path = starter.init_path();

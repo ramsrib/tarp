@@ -172,6 +172,12 @@ pub struct TerminalManager {
     /// connection ongoing.
     #[allow(dead_code)]
     session_sharer: Rc<RefCell<Option<ModelHandle<Network>>>>,
+
+    /// The device name of the follower end of this session's PTY (e.g.
+    /// "/dev/ttys012"), used to locate the session when handling focus_tab
+    /// URIs. None until the PTY has been started, and on platforms whose
+    /// PTYs have no device name.
+    tty_name: Option<String>,
 }
 
 impl Drop for TerminalManager {
@@ -815,6 +821,7 @@ impl TerminalManager {
 
             inactive_pty_reads_rx,
             session_sharer,
+            tty_name: None,
         };
 
         let terminal_manager_model = ctx.add_model(|ctx| {
@@ -981,6 +988,13 @@ impl TerminalManager {
         let pid = pty.get_pid();
         #[cfg(unix)]
         let fd = pty.get_fd();
+        // Capture the follower's device name while this thread still owns the
+        // PTY; once the event loop takes ownership below, the fd can be closed
+        // (and its number reused) at any time.
+        #[cfg(unix)]
+        {
+            self.tty_name = super::unix::tty_name_for_leader_fd(fd);
+        }
 
         // Create the channel above and pass the receving side to the event loop.
         let event_loop_handle = Self::start_pty_event_loop(
@@ -2672,6 +2686,15 @@ impl crate::terminal::TerminalManager for TerminalManager {
 
     fn view(&self) -> ViewHandle<TerminalView> {
         self.view.clone()
+    }
+
+    fn tty_name(&self) -> Option<String> {
+        // A dead session must not match: its device name may already have
+        // been recycled for a newer PTY in another pane.
+        if self.model.lock().has_exited() {
+            return None;
+        }
+        self.tty_name.clone()
     }
 
     fn on_view_detached(

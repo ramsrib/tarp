@@ -28,6 +28,12 @@ pub trait TerminalManager: Any {
     /// Returns the terminal view being managed.
     fn view(&self) -> ViewHandle<TerminalView>;
 
+    /// Returns the device name of the follower ("slave") end of the local PTY
+    /// backing this session (e.g. "/dev/ttys012"), if there is one.
+    fn tty_name(&self) -> Option<String> {
+        None
+    }
+
     /// Called when the terminal pane detaches from its pane group. This is a sensitive path -
     /// do not do anything with high latency here. Note that we cannot rely on events emitted
     /// here to be processed before the window closes.

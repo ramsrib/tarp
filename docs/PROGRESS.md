@@ -6,6 +6,36 @@ Companion to [`../TARP-PLAN.md`](../TARP-PLAN.md) (the plan) and
 
 ---
 
+## 2026-07-27
+
+### `tarp://action/focus_tab?tty=…` — jump to the tab running a given tty  ✅ (merged `71150dc7`)
+Deep link for raven (and notification clicks): `open -g "tarp://action/focus_tab?tty=ttys012"`
+switches to the tab whose pane runs that tty, focuses the exact pane if the tab is
+split, and raises the window. `tty` takes the `ps -o tty=` form (`ttys012`) or the
+full `/dev/ttys012`; both normalize to the same match.
+- **tty captured at spawn, not derived on demand.** `libc::ptsname()` on the PTY
+  leader fd (new `tty_name_for_leader_fd`, `local_tty/unix.rs`), called before the
+  `Pty` moves into the event-loop thread — after the move the fd can close and its
+  number be recycled at any time. Stored on the local `TerminalManager`; exposed via
+  a defaulted trait method so the shared-session viewer/mock managers stay untouched.
+- **Lookup is newest-first across all terminal-manager models** (`models_of_type`,
+  EntityIds ascend by creation). The OS recycles tty names, so a session mid-teardown
+  can briefly cache the same name as a newer live one — newest wins, and exited
+  sessions (`TerminalModel::has_exited()`) never match at all.
+- **Teardown hardening** (closes the recycling race at the root): the PTY event loop
+  now marks the model exited *before* `pty.kill()` closes the leader fd, and the two
+  registration `.unwrap()`s became a graceful shutdown (log → exit → kill → wakeup)
+  instead of a panicking thread that left an un-exited zombie pane behind.
+- **No activation steal**: `FocusTab` maps to `WindowBehaviorHint::Nothing`; a missing
+  or unmatched tty logs a warning and does nothing, so background `open -g` never
+  raises the app on a miss. Known limitation (accepted): a session stacked *under*
+  another view in the same pane's navigation stack degrades to the same warn+no-op.
+- 4 parse tests in `uri_tests.rs` (bare tty, `%2Fdev%2F`-encoded, missing param,
+  unknown action still errors). Raven-side wiring is tracked separately: bind `f` to
+  the `open -g` command, switch notification clicks to terminal-notifier `-execute`.
+
+---
+
 ## 2026-06-05
 
 ### Post-v0.1.0 polish — rebuilt and republished as v0.1.0  ✅ (dev-verified)
